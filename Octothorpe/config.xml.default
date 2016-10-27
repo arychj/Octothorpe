@@ -1,0 +1,5 @@
+<config>
+    <processing>
+        <max_workers>5</max_workers>
+    </processing>
+</config>
