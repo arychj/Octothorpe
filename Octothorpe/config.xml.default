@@ -2,4 +2,15 @@
     <processing>
         <max_workers>5</max_workers>
     </processing>
+    <database>
+        <path>./octothorpe.sqlite3</path>
+        <queries>
+            <basepath>./Resources/Queries</basepath>
+        </queries>
+    </database>
+    <services>
+        <directories>
+            <directory></directory>
+        </directories>
+    </services>
 </config>
