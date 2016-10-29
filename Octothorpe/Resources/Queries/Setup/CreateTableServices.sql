@@ -1,0 +1,4 @@
+CREATE TABLE tblServices(
+	id		INTEGER PRIMARY KEY,
+	Name	TEXT
+)

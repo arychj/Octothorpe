@@ -1,0 +1,5 @@
+CREATE TABLE tblLogRules(
+	id			INTEGER PRIMARY KEY,
+	id_Rule		INTEGER,
+	TriggeredOn	DATETIME
+)
