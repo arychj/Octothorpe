@@ -29,12 +29,17 @@ class InstructionQueue:
 
     @classmethod
     def StartPolling(cls):
+        cls._poll = True
+
         t = threading.Thread(target=cls.PollForInstructions)
         t.start()
-        
+
+    @classmethod
+    def StopPolling(cls):
+        cls._poll = False
+                
     @classmethod
     def PollForInstructions(cls):
         while(cls._poll):
-            x = 1
             time.sleep(1)
 

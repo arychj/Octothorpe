@@ -9,4 +9,4 @@ class Test(Service):
         time.sleep(i)
         print(f"({i}) {instruction.Payload}")
 
-        self.Emit("emission", instruction, ">>> emitted instruction payload")
+        self.Emit("emission", instruction, f">>> emitted instruction payload({instruction.Payload})")
