@@ -10,3 +10,4 @@ class Test(Service):
         print(f"({i}) {instruction.Payload}")
 
         self.Emit("emission", instruction, f">>> emitted instruction payload({instruction.Payload})")
+        self.Emit("emission", instruction, ", ".join(self.Describe("Process")))

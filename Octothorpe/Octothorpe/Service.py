@@ -1,3 +1,4 @@
+import inspect
 from abc import ABCMeta, abstractmethod
 from importlib import import_module
 
@@ -14,6 +15,13 @@ class Service(metaclass=ABCMeta):
     @abstractmethod
     def Process(self, instruction):
         pass
+
+    def Describe(self, method_name):
+        method = getattr(self, method_name, None)
+        if(method == None):
+            return None
+        else:
+            return inspect.getargspec(method).args
 
     def Emit(self, event_type, instruction, payload):
         print("emit")

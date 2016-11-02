@@ -1,5 +1,5 @@
 
-class Instruction:
+class Instruction(object):
     Id = None
     Service = None
     Payload = None
