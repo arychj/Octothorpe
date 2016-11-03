@@ -1,6 +1,7 @@
-import threading
+import sys, threading
 
 from .Config import Config
+from .Instruction import Instruction
 from .InstructionQueue import InstructionQueue
 from .Log import Log
 from .Worker import Worker
@@ -9,7 +10,6 @@ class Manager:
     _loop = True
 
     def Start(self):
-        InstructionQueue.blah()
         InstructionQueue.StartPolling()
 
         t = threading.Thread(target=self.Loop)
@@ -17,16 +17,15 @@ class Manager:
 
     def Stop(self):
         self._loop = False
-        InstructionQueue.Push(None)
         InstructionQueue.StopPolling()
+        InstructionQueue.Queue(Instruction.GetStopInstruction())
 
     def Loop(self):
-        while(self._loop):
-            instruction = InstructionQueue.Next()
+        instruction = InstructionQueue.Next()
+        while(self._loop and (instruction.Id != -1) and Worker.IsAvailable()):
             try:
-                while(self._loop and (instruction != None) and Worker.IsAvailable()):
-                    Worker.Process(instruction)
-                    instruction = InstructionQueue.Next()
+                Worker.Process(instruction)
+                instruction = InstructionQueue.Next()
             except Exception as e:
                 Log.Exception(e)
 

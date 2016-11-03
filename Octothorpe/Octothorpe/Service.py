@@ -1,4 +1,4 @@
-import inspect
+import inspect, time
 from abc import ABCMeta, abstractmethod
 from importlib import import_module
 
@@ -40,6 +40,6 @@ class Service(metaclass=ABCMeta):
             #create instruction record
             id = 5000
             payload = event.Payload
-            instruction = Instruction(id, service, payload)
-            InstructionQueue.Push(instruction)
+            instruction = Instruction(id, instruction.Level + 1, time.time(), service, payload)
+            InstructionQueue.Queue(instruction)
 

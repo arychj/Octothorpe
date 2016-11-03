@@ -7,7 +7,7 @@ class Test(Service):
     def Process(self, instruction):
         i = randint(0,5)
         time.sleep(i)
-        print(f"({i}) {instruction.Payload}")
+        print(f"{instruction.GetPriority()}| ({i}) {instruction.Payload}")
 
         self.Emit("emission", instruction, f">>> emitted instruction payload({instruction.Payload})")
         self.Emit("emission", instruction, ", ".join(self.Describe("Process")))
