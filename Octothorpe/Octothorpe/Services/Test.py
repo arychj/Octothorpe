@@ -17,5 +17,8 @@ class Test(Service):
         })
 
         self.Emit("emission", {
-        	"text": ", ".join(self.Describe("Process"))
+        	"text": ", ".join(self.Describe("MoreThanOneParamater"))
         })
+
+    def MoreThanOneParamater(self, more, than, one, parameter):
+        pass

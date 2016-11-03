@@ -4,7 +4,6 @@ from importlib import import_module
 
 from .Event import Event
 from .Instruction import Instruction
-#from .InstructionQueue import InstructionQueue
 
 class Service(metaclass=ABCMeta):
     _queue = None
@@ -29,7 +28,7 @@ class Service(metaclass=ABCMeta):
         if(method == None):
             return None
         else:
-            return inspect.getargspec(method).args
+            return list(inspect.signature(method).parameters)
 
     def Emit(self, event_type, payload):
         print("emit")
