@@ -5,13 +5,15 @@ class Instruction(object):
     Level = None
     QueuedOn = None
     Service = None
+    Method = None
     Payload = None
 
-    def __init__(self, id, level, queued_on, service, payload):
+    def __init__(self, id, level, queued_on, service, method, payload):
         self.Id = id
         self.Level = level
         self.QueuedOn = queued_on
         self.Service = service
+        self.Method = method
         self.Payload = payload
 
     def Complete(self):
@@ -33,4 +35,4 @@ class Instruction(object):
 
     @staticmethod
     def GetStopInstruction():
-        return Instruction(-1, 0, 0, None, None)
+        return Instruction(-1, 0, 0, None, None, None)

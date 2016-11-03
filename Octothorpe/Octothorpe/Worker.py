@@ -30,8 +30,9 @@ class Worker:
     @classmethod
     def Run(cls, instruction):
         try:
-            service = Service.Get(instruction.Service)
-            service.Process(instruction)
+#            service = Service.Get(instruction.Service)
+#            service.Process(instruction)
+            Service.Process(instruction)
         except Exception as e:
             Log.Exception(e)
         finally:

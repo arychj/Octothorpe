@@ -4,7 +4,10 @@ from random import randint
 import time
 
 class Test(Service):
-    def Process(self, instruction):
+    def Echo(self, instruction):
+        print(f"{instruction.GetPriority()}| {instruction.Payload}")
+
+    def Test(self, instruction):
         i = randint(0,5)
         time.sleep(i)
         print(f"{instruction.GetPriority()}| ({i}) {instruction.Payload}")

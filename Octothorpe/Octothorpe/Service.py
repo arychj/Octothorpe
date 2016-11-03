@@ -7,14 +7,13 @@ from .Instruction import Instruction
 from .InstructionQueue import InstructionQueue
 
 class Service(metaclass=ABCMeta):
-    @classmethod
-    def Get(cls, name):
-        service = getattr(import_module(f".Services.{name}", "Octothorpe"), name)
-        return service()
+    @staticmethod
+    def Process(instruction):
+        service = getattr(import_module(f".Services.{instruction.Service}", "Octothorpe"), instruction.Service)
+        method = getattr(service(), instruction.Method, None)
 
-    @abstractmethod
-    def Process(self, instruction):
-        pass
+        #method(**dict)
+        method(instruction)
 
     def Describe(self, method_name):
         method = getattr(self, method_name, None)
@@ -36,10 +35,10 @@ class Service(metaclass=ABCMeta):
         #log event
         #get all rules that have hook on event
         #generate instruction for applicable services
-        for service in ["Echo"]:
+        for method in ["Echo"]:
             #create instruction record
             id = 5000
             payload = event.Payload
-            instruction = Instruction(id, instruction.Level + 1, time.time(), service, payload)
+            instruction = Instruction(id, instruction.Level + 1, time.time(), "Test", method, payload)
             InstructionQueue.Queue(instruction)
 
