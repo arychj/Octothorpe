@@ -21,7 +21,7 @@ class Worker(Thread):
         instruction = self._queue.Dequeue()
         while(instruction.Id != -1):
             try:
-                print(f"[{self._name}] working...")
+                Log.Debug(f"[{self._name}] processing instruction {instruction.Id}...")
                 Service.Process(self._queue, instruction)
             except Exception as e:
                 Log.Exception(e)

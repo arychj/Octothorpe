@@ -20,6 +20,8 @@ else:
     manager = Manager()
     manager.Start()
 
+    InstructionQueue.Enqueue(Instruction(100, 1, time.time(), "Test", "RaiseException", None))
+
     for i in range(50):
         payload = "{\"text\":\"" + ("*" * i) + "\"}"
         instruction = Instruction(i, 1, time.time(), "Test", ("Echo" if randint(0,1) == 0 else "Test"), payload)

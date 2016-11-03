@@ -1,5 +1,6 @@
 import threading, time, queue
 
+from .Config import Config
 from .Instruction import Instruction
 from .Worker import Worker
 
@@ -9,7 +10,7 @@ class InstructionQueue:
 
     @classmethod
     def Start(cls):
-        for name in range(5):
+        for name in range(Config.GetInt("processing/worker_threads")):
             Worker(cls, name)
 
         cls._start_polling()
@@ -18,7 +19,7 @@ class InstructionQueue:
     def Stop(cls):
         cls._poll = False
 
-        for _ in range(5):
+        for _ in range(Config.GetInt("processing/worker_threads")):
             cls.Enqueue(Instruction.GetStopInstruction())
 
     @classmethod

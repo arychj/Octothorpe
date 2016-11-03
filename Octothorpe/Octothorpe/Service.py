@@ -4,6 +4,7 @@ from importlib import import_module
 
 from .Event import Event
 from .Instruction import Instruction
+from .Log import Log
 
 class Service(metaclass=ABCMeta):
     _queue = None
@@ -31,7 +32,7 @@ class Service(metaclass=ABCMeta):
             return list(inspect.signature(method).parameters)
 
     def Emit(self, event_type, payload):
-        print("emit")
+        Log.Debug(f"Emitted event type {event_type}")
 
         event = Event(
             self._instruction,
@@ -50,3 +51,8 @@ class Service(metaclass=ABCMeta):
             instruction = Instruction(id, self._instruction.Level + 1, time.time(), "Test", method, payload, False)
             self._queue.Enqueue(instruction)
 
+    def Debug(self, message):
+        Log.Debug(message)
+
+    def Log(self, message):
+        Log.Event(message)

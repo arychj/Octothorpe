@@ -25,6 +25,15 @@ class Config():
         return val
 
     @classmethod
+    def GetBool(cls, key):
+        val = cls.GetString(key)
+
+        if(val != None):
+            val = bool(val)
+
+        return val
+
+    @classmethod
     def LoadConfig(cls):
         if(cls._configfile == None):
             raise Exception("no config file specified.")

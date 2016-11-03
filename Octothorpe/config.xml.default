@@ -1,6 +1,10 @@
 <config>
+    <debug>True</debug>
+    <logging>
+        <time_format><![CDATA[%Y-%m-%d %H:%M:%S]]></time_format>
+    </logging>
     <processing>
-        <max_workers>5</max_workers>
+        <worker_threads>5</worker_threads>
     </processing>
     <database>
         <path>./octothorpe.sqlite3</path>
