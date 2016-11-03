@@ -31,7 +31,13 @@ class Instruction(object):
         return priority
 
     def __lt__(self, other):
-        return self.GetPriority() < other.GetPriority()
+        sp = self.GetPriority()
+        op = other.GetPriority()
+
+        if(sp == op):
+            return self.QueuedOn < other.QueuedOn
+        else:
+            return  sp < op
 
     @staticmethod
     def GetStopInstruction():

@@ -10,15 +10,14 @@ class Manager:
     _loop = True
 
     def Start(self):
-        InstructionQueue.StartPolling()
+        InstructionQueue.Start()
 
-        t = threading.Thread(target=self.Loop)
-        t.start()
+        #t = threading.Thread(target=self.Loop)
+        #t.start()
 
     def Stop(self):
         self._loop = False
-        InstructionQueue.StopPolling()
-        InstructionQueue.Queue(Instruction.GetStopInstruction())
+        InstructionQueue.Stop()
 
     def Loop(self):
         instruction = InstructionQueue.Next()

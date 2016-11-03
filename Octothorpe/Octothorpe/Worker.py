@@ -1,45 +1,32 @@
-import threading, time
+import time
+
+from threading import Thread
 
 from .Config import Config
 from .Log import Log
 from .Service import Service
 
-class Worker:
-    _lock = threading.Lock()
-    _active_workers = 0
+class Worker(Thread):
+    _queue = None
+    _name = None
 
-    @classmethod
-    def IsAvailable(cls):
-        while(cls._active_workers >= Config.GetInt("processing/max_workers")):
-            time.sleep(0.1)
+    def __init__(self, queue, name):
+        Thread.__init__(self)
+        
+        self._queue = queue
+        self._name = name
+        self.start()
 
-        return True
+    def run(self):
+        instruction = self._queue.Dequeue()
+        while(instruction.Id != -1):
+            try:
+                print(f"[{self._name}] working...")
+                Service.Process(self._queue, instruction)
+            except Exception as e:
+                Log.Exception(e)
+            finally:
+                instruction.Complete()
+                self._queue.Complete()
 
-    @classmethod
-    def Count(cls):
-        return cls._active_workers
-
-    @classmethod
-    def Process(cls, instruction):
-        with cls._lock:
-            cls._active_workers += 1
-
-        t = threading.Thread(target=cls.Run, args=(instruction,))
-        t.start()
-    
-    @classmethod
-    def Run(cls, instruction):
-        try:
-#            service = Service.Get(instruction.Service)
-#            service.Process(instruction)
-            Service.Process(instruction)
-        except Exception as e:
-            Log.Exception(e)
-        finally:
-            instruction.Complete()
-            cls.End()
-
-    @classmethod
-    def End(cls):
-        with cls._lock:
-            cls._active_workers -= 1
+            instruction = self._queue.Dequeue()

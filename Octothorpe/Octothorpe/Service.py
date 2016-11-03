@@ -4,15 +4,19 @@ from importlib import import_module
 
 from .Event import Event
 from .Instruction import Instruction
-from .InstructionQueue import InstructionQueue
+#from .InstructionQueue import InstructionQueue
 
 class Service(metaclass=ABCMeta):
-    @staticmethod
-    def Process(instruction):
-        service = getattr(import_module(f".Services.{instruction.Service}", "Octothorpe"), instruction.Service)
-        method = getattr(service(), instruction.Method, None)
+    _queue = None
 
-        #method(**dict)
+    @staticmethod
+    def Process(queue, instruction):
+        service_type = getattr(import_module(f".Services.{instruction.Service}", "Octothorpe"), instruction.Service)
+        service = service_type()
+        service._queue = queue
+
+        method = getattr(service, instruction.Method, None)
+
         method(instruction)
 
     def Describe(self, method_name):
@@ -40,5 +44,5 @@ class Service(metaclass=ABCMeta):
             id = 5000
             payload = event.Payload
             instruction = Instruction(id, instruction.Level + 1, time.time(), "Test", method, payload)
-            InstructionQueue.Queue(instruction)
+            self._queue.Enqueue(instruction)
 
