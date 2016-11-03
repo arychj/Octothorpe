@@ -8,16 +8,21 @@ from .Instruction import Instruction
 
 class Service(metaclass=ABCMeta):
     _queue = None
+    _instruction = None
 
     @staticmethod
     def Process(queue, instruction):
         service_type = getattr(import_module(f".Services.{instruction.Service}", "Octothorpe"), instruction.Service)
+
         service = service_type()
         service._queue = queue
+        service._instruction = instruction
 
         method = getattr(service, instruction.Method, None)
-
-        method(instruction)
+        if(instruction.Payload == None):
+            method()
+        else:
+            method(**instruction.Payload)
 
     def Describe(self, method_name):
         method = getattr(self, method_name, None)
@@ -26,11 +31,11 @@ class Service(metaclass=ABCMeta):
         else:
             return inspect.getargspec(method).args
 
-    def Emit(self, event_type, instruction, payload):
+    def Emit(self, event_type, payload):
         print("emit")
 
         event = Event(
-            instruction,
+            self._instruction,
             self.__class__.__name__, 
             event_type, 
             payload
@@ -43,6 +48,6 @@ class Service(metaclass=ABCMeta):
             #create instruction record
             id = 5000
             payload = event.Payload
-            instruction = Instruction(id, instruction.Level + 1, time.time(), "Test", method, payload)
+            instruction = Instruction(id, self._instruction.Level + 1, time.time(), "Test", method, payload, False)
             self._queue.Enqueue(instruction)
 

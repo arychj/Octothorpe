@@ -4,13 +4,18 @@ from random import randint
 import time
 
 class Test(Service):
-    def Echo(self, instruction):
-        print(f"{instruction.Id} ({instruction.GetPriority()}): Echo: {instruction.Payload}")
+    def Echo(self, text):
+        print(f"{self._instruction.Id} ({self._instruction.GetPriority()}): Echo: {text}")
 
-    def Test(self, instruction):
+    def Test(self, text):
         i = randint(0,5)
         time.sleep(i)
-        print(f"{instruction.Id} ({instruction.GetPriority()}): Test: {instruction.Payload} [slept for {i}]")
+        print(f"{self._instruction.Id} ({self._instruction.GetPriority()}): Test: {text} [slept for {i}]")
 
-        self.Emit("emission", instruction, f">>> emitted instruction payload({instruction.Payload})")
-        self.Emit("emission", instruction, ", ".join(self.Describe("Process")))
+        self.Emit("emission", {
+        	"text": f">>> emitted instruction payload({text})"
+        })
+
+        self.Emit("emission", {
+        	"text": ", ".join(self.Describe("Process"))
+        })

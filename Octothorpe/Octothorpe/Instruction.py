@@ -1,4 +1,6 @@
-import sys, time
+import json, sys, time
+
+from .Log import Log
 
 class Instruction(object):
     Id = None
@@ -8,13 +10,17 @@ class Instruction(object):
     Method = None
     Payload = None
 
-    def __init__(self, id, level, queued_on, service, method, payload):
+    def __init__(self, id, level, queued_on, service, method, payload, isPayloadJson = True):
         self.Id = id
         self.Level = level
         self.QueuedOn = queued_on
         self.Service = service
         self.Method = method
-        self.Payload = payload
+
+        if(isPayloadJson and payload != None):
+            self.Payload = json.loads(payload)
+        else:
+            self.Payload = payload
 
     def Complete(self):
         return None
