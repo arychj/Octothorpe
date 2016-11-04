@@ -1,4 +1,4 @@
-import json, sys, time
+import json, re, sys, time
 
 from .Log import Log
 
@@ -10,17 +10,18 @@ class Instruction(object):
     Method = None
     Payload = None
 
-    def __init__(self, id, level, queued_on, service, method, payload, isPayloadJson = True):
+    def __init__(self, id, level, queued_on, service, method, payload):
         self.Id = id
         self.Level = level
         self.QueuedOn = queued_on
         self.Service = service
         self.Method = method
+        self.Payload = Instruction._parse_payload(payload)    
 
-        if(isPayloadJson and payload != None):
-            self.Payload = json.loads(payload)
-        else:
-            self.Payload = payload
+    def Record(self):
+        self.Id = 6000
+
+        return None
 
     def Complete(self):
         return None
@@ -48,3 +49,31 @@ class Instruction(object):
     @staticmethod
     def GetStopInstruction():
         return Instruction(-1, 0, 0, None, None, None)
+
+    @staticmethod
+    def Parse(s):
+        instruction = None
+
+        m = re.match("^(?P<Service>.*?)\.(?P<Method>.*?)\((?P<Payload>.*)\)$", s)
+        if(m != None):
+            instruction = Instruction(
+                0,
+                1,
+                time.time(),
+                m.group("Service"),
+                m.group("Method"),
+                Instruction._parse_payload(m.group("Payload"))
+            )
+        
+        return instruction 
+
+    def _parse_payload(s):
+        if(s == None):
+            return None
+        elif(isinstance(s, str)):
+            Log.Debug(f"Decoding JSON payload: {s}")
+            return json.loads(s)
+        elif(isinstance(s, dict)):
+            return s
+        else:
+            raise Exception("Invalid payload format")

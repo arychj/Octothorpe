@@ -22,7 +22,7 @@ class Worker(Thread):
         while(instruction.Id != -1):
             try:
                 Log.Debug(f"[{self._name}] processing instruction {instruction.Id}...")
-                Service.Process(self._queue, instruction)
+                Service.Call(instruction)
             except Exception as e:
                 Log.Exception(e)
             finally:

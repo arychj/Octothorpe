@@ -11,11 +11,10 @@ class Service(metaclass=ABCMeta):
     _instruction = None
 
     @staticmethod
-    def Process(queue, instruction):
+    def Call(instruction):
         service_type = getattr(import_module(f".Services.{instruction.Service}", "Octothorpe"), instruction.Service)
 
         service = service_type()
-        service._queue = queue
         service._instruction = instruction
 
         method = getattr(service, instruction.Method, None)
@@ -48,8 +47,8 @@ class Service(metaclass=ABCMeta):
             #create instruction record
             id = 5000
             payload = event.Payload
-            instruction = Instruction(id, self._instruction.Level + 1, time.time(), "Test", method, payload, False)
-            self._queue.Enqueue(instruction)
+            instruction = Instruction(id, self._instruction.Level + 1, time.time(), "Test", method, payload)
+            Service._queue.Enqueue(instruction)
 
     def Debug(self, message):
         Log.Debug(message)

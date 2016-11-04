@@ -1,20 +1,28 @@
 import sys, threading
 
-from .Config import Config
-from .Instruction import Instruction
 from .InstructionQueue import InstructionQueue
-from .Log import Log
 from .Server import Server
-from .Worker import Worker
+from .Service import Service
 
 class Manager:
-    _loop = True
 
-    def Start(self):
+    @staticmethod
+    def Start():
+        Service._queue = InstructionQueue
+
         InstructionQueue.Start()
         Server.Start()
 
-    def Stop(self):
+    @staticmethod
+    def Stop():
         InstructionQueue.Stop()
         Server.Stop()
+
+    @staticmethod
+    def Queue(instruction):
+        InstructionQueue.Enqueue(instruction)
+
+    @staticmethod
+    def Process(instruction):
+        Service.Call(instruction)
 
