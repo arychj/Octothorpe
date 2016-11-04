@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys, time
+import argparse, sys, time
 
 from Octothorpe.Config import Config
 from Octothorpe.Database import Database
@@ -10,32 +10,34 @@ from Octothorpe.Manager import Manager
 
 from random import randint
 
-if len(sys.argv) != 2:
-    print(f"\tUsage: {sys.argv[0]} config.xml")
-else:
-    Config.SetConfigFile(sys.argv[1])
+parser = argparse.ArgumentParser()
+parser.add_argument("--config", dest ="config", required=True, help="Configuration File")
+parser.add_argument("--test", dest ="test", action="store_true", help="Generate and queue test instructions")
+parser.add_argument("--setup", dest ="setup", action="store_true", help="Perform initial setup")
 
-#    Database.CreateDatabase()
+args = parser.parse_args()
+Config.SetConfigFile(args.config)
 
-    manager = Manager()
-    manager.Start()
+if(args.setup):
+    Database.CreateDatabase()
 
-    InstructionQueue.Enqueue(Instruction(100, 1, time.time(), "Test", "RaiseException", None))
-
+if(args.test):
     for i in range(50):
         payload = "{\"text\":\"" + ("*" * i) + "\"}"
         instruction = Instruction(i, 1, time.time(), "Test", ("Echo" if randint(0,1) == 0 else "Test"), payload)
-        InstructionQueue.Enqueue(instruction)
+        Manager.Queue(instruction)
 
-    while(1):
-        try:
-            line = input()
-            if(line == "stop"):
-                print("Stopping...")
-                manager.Stop()
-                break
-            else:
-                pieces = line.split(";")
-                InstructionQueue.Enqueue(Instruction(0, 1, time.time(), pieces[0], pieces[1]))
-        except Exception as e:
-            Log.Exception(e)
+Manager.Start()
+
+while(1):
+    try:
+        line = input()
+        if(line == "stop"):
+            print("Stopping...")
+            Manager.Stop()
+            break
+        else:
+            instruction = Instruction.Parse(line)
+            Manager.Queue(instruction)
+    except Exception as e:
+        Log.Exception(e)
