@@ -28,23 +28,24 @@ class Instruction(object):
 
     def GetPriority(self):
         priority = 0
-
-        if(self.Id == -1):
-            priority = sys.maxsize
-        else:
-            priority += self.Level * 10
-            priority += int(time.time()) - int(self.QueuedOn)
+        priority += self.Level * 10
+        priority += -1 * (int(time.time()) - int(self.QueuedOn))
 
         return priority
 
     def __lt__(self, other):
-        sp = self.GetPriority()
-        op = other.GetPriority()
-
-        if(sp == op):
-            return self.QueuedOn < other.QueuedOn
+        if(self.Id == -1):
+            return True
+        elif(other.Id == -1):
+            return False
         else:
-            return  sp < op
+            sp = self.GetPriority()
+            op = other.GetPriority()
+
+            if(sp == op):
+                return self.QueuedOn < other.QueuedOn
+            else:
+                return  sp < op
 
     @staticmethod
     def GetStopInstruction():
@@ -67,6 +68,7 @@ class Instruction(object):
         
         return instruction 
 
+    @staticmethod
     def _parse_payload(s):
         if(s == None):
             return None

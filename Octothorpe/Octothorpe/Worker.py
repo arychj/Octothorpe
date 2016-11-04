@@ -23,6 +23,7 @@ class Worker(Thread):
             try:
                 Log.Debug(f"[{self._name}] processing instruction {instruction.Id}...")
                 Service.Call(instruction)
+                Log.Debug(f"[{self._name}] finished instruction {instruction.Id}...")
             except Exception as e:
                 Log.Exception(e)
             finally:
