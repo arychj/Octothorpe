@@ -4,6 +4,10 @@ from random import randint
 import time
 
 class Test(Service):
+    @property
+    def _emitted_event_types(self):
+        return ["emission"]
+
     def Echo(self, text):
         self.Log(f"{self._instruction.Id} ({self._instruction.GetPriority()}) > Echo: {text}")
 
