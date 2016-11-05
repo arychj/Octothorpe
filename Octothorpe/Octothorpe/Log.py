@@ -11,7 +11,7 @@ class Log:
     @classmethod
     def Event(cls, message):
         #temporary
-        cls._console_write("event", message)
+        cls._console_write("EVENT", message)
         return None
     
     @classmethod
@@ -34,7 +34,7 @@ class Log:
 
     @classmethod
     def _console_write(cls, type, message):
-        type = f"[{type}]".upper()
+        type = f"[{type}]"
         print(f"{type:10} [{cls._get_timestamp()}]: {message}")
 
     @classmethod

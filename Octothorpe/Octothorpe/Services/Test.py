@@ -8,14 +8,17 @@ class Test(Service):
     def _emitted_event_types(self):
         return ["emission"]
 
-    def Echo(self, text):
-        self.Log(f"{self._instruction.Id} ({self._instruction.GetPriority()}) > Echo: {text}")
+    def Echo(self, **kwargs):
+        s = ", ".join(["%s=%s" % (k, v) for (k, v) in kwargs.items()])
+        self.Log(f"{self._instruction.ShortTag} > Echo: {s}")
+
+        return kwargs
 
     def Test(self, text):
         i = randint(0,5)
         time.sleep(i)
 
-        self.Log(f"{self._instruction.Id} ({self._instruction.GetPriority()}) > Test: {text} [slept for {i}]")
+        self.Log(f"{self._instruction.ShortTag} > Test: {text} [slept for {i}]")
 
         self.Emit("emission", {
         	"text": f">>> emitted instruction payload({text})"

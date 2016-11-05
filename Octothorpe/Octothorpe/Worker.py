@@ -21,13 +21,16 @@ class Worker(Thread):
         instruction = self._queue.Dequeue()
         while(instruction.Id != -1):
             try:
-                Log.Debug(f"[{self._name}] processing instruction {instruction.Id}...")
+                Log.Debug(f"[{self._name}] Started processing instruction {instruction.Id}...")
+
                 Service.Call(instruction)
-                Log.Debug(f"[{self._name}] finished instruction {instruction.Id}...")
+                instruction.Complete()
+
+                Log.Debug(f"[{self._name}] Finished processing instruction {instruction.Id} in {instruction.ExecutionTime:.2f} seconds")
             except Exception as e:
+                instruction.Fail()
                 Log.Exception(e)
             finally:
-                instruction.Complete()
                 self._queue.Complete()
 
             instruction = self._queue.Dequeue()

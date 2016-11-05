@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-import argparse, sys, time
+import argparse, sys
 
 from Octothorpe.Config import Config
-from Octothorpe.Database import Database
+from Octothorpe.Database.Database import Database
 from Octothorpe.Instruction import Instruction
-from Octothorpe.InstructionQueue import InstructionQueue
 from Octothorpe.Log import Log
 from Octothorpe.Manager import Manager
 
@@ -19,12 +18,18 @@ args = parser.parse_args()
 Config.SetConfigFile(args.config)
 
 if(args.setup):
-    Database.CreateDatabase()
+    Database.Setup()
 
 if(args.test):
     for i in range(50):
         payload = "{\"text\":\"" + ("*" * i) + "\"}"
-        instruction = Instruction(i, 1, time.time(), "Test", ("Echo" if randint(0,1) == 0 else "Test"), payload)
+        instruction = Instruction.Create(
+            1,
+            "Test", 
+            ("Echo" if randint(0,1) == 0 else "Test"), 
+            payload
+        )
+
         Manager.Queue(instruction)
 
 Manager.Start()

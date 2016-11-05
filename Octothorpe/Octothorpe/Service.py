@@ -23,7 +23,7 @@ class Service(metaclass=ABCMeta):
 
     def Emit(self, event_type, payload):
         if(event_type in self._emitted_event_types):
-            Log.Debug(f"{self._instruction.Service}.{self._instruction.Method}() emitted event type '{event_type}'")
+            Log.Debug(f"Event '{event_type}' emitted by {self._instruction.Service}.{self._instruction.Method}()")
 
             event = Event(
                 self._instruction,
@@ -39,7 +39,13 @@ class Service(metaclass=ABCMeta):
                 #create instruction record
                 id = 5000
                 payload = event.Payload
-                instruction = Instruction(id, self._instruction.Level + 1, time.time(), "Test", method, payload)
+                instruction = Instruction.Create(
+                    self._instruction.Level + 1, 
+                    "Test", 
+                    method, 
+                    payload
+                )
+
                 Service._queue.Enqueue(instruction)
 
     def Debug(self, message):

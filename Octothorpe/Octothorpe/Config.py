@@ -29,7 +29,7 @@ class Config():
         val = cls.GetString(key)
 
         if(val != None):
-            val = bool(val)
+            val = (True if val.lower() == "true" else False)
 
         return val
 

@@ -1,37 +1,89 @@
-import json, re, sys, time
+import json, re, sys, time, uuid
 
+from .Config import Config
+from .Database.Statement import Statement
 from .Log import Log
 
 class Instruction(object):
-    Id = None
-    Level = None
-    QueuedOn = None
-    Service = None
-    Method = None
-    Payload = None
-
-    def __init__(self, id, level, queued_on, service, method, payload):
+    
+    def __init__(self, id, ident, level, service, method, payload, given_on, completed_on = None):
         self.Id = id
+        self.Ident = ident
         self.Level = level
-        self.QueuedOn = queued_on
         self.Service = service
         self.Method = method
-        self.Payload = Instruction._parse_payload(payload)    
+        self.Payload = Instruction._parse_payload(payload)
+        self.GivenOn = given_on
+        self.CompletedOn = completed_on
 
-    def Record(self):
-        self.Id = 6000
+        if(self.Id == None):
+            self.CreateRecord()
 
-        return None
-
-    def Complete(self):
-        return None
-
-    def GetPriority(self):
+    @property
+    def Priority(self):
         priority = 0
         priority += self.Level * 10
-        priority += -1 * (int(time.time()) - int(self.QueuedOn))
+        priority += -1 * (int(time.time()) - int(self.GivenOn))
 
         return priority
+
+    @property
+    def ShortIdent(self):
+        if(self.Ident == None):
+            return None
+        else:
+            return self.Ident[:8]
+
+    @property
+    def Tag(self):
+        if(self.Id == None or self.Ident == None):
+            return None
+        else:
+            return f"{self.Ident}:{self.Id}/{self.Priority}/{self.Level}/{self.Service}.{self.Method}"
+
+    @property
+    def ShortTag(self):
+        if(self.Id == None or self.Ident == None):
+            return None
+        else:
+            return f"{self.ShortIdent}:{self.Id}/{self.Level}/{self.Priority}"
+
+    @property
+    def ExecutionTime(self):
+        if(self.GivenOn == None or self.CompletedOn == None):
+            return None
+        else:
+            return self.CompletedOn - self.GivenOn
+
+    def CreateRecord(self):
+        self.Ident = Instruction._generate_ident()
+
+        statement = Statement.Get("Instructions/Create")
+        result = statement.Execute({
+            "ident": self.Ident,
+            "level": self.Level,
+            "service": self.Service,
+            "method": self.Method,
+            "payload": json.dumps(self.Payload),
+            "given_on": Statement.FormatDatetime(self.GivenOn)
+        })
+
+        self.Id = result.LastId
+
+    def Complete(self):
+        if(self.Id != None):
+            self.CompletedOn = time.time()
+
+            statement = Statement.Get("Instructions/Complete")
+            statement.Execute({
+                "id": self.Id,
+                "completed_on": Statement.FormatDatetime(self.CompletedOn)
+            })
+        else:
+            raise Exception("Cannot complete unsaved instruction.")
+
+    def Fail(self):
+        self.Complete()
 
     def __lt__(self, other):
         if(self.Id == -1):
@@ -39,13 +91,34 @@ class Instruction(object):
         elif(other.Id == -1):
             return False
         else:
-            sp = self.GetPriority()
-            op = other.GetPriority()
+            sp = self.Priority
+            op = other.Priority
 
             if(sp == op):
-                return self.QueuedOn < other.QueuedOn
+                return self.GivenOn < other.GivenOn
             else:
                 return  sp < op
+
+    @staticmethod
+    def Create(level, service, method, payload):
+        instruction = Instruction(
+            None,
+            None,
+            level,
+            service,
+            method,
+            payload,
+            time.time(),
+            None
+        )
+
+        Log.Debug(f"Created instruction {instruction.ShortTag}")
+
+        return instruction
+
+    @staticmethod
+    def Load():
+        pass
 
     @staticmethod
     def GetStopInstruction():
@@ -57,10 +130,8 @@ class Instruction(object):
 
         m = re.match("^(?P<Service>.*?)\.(?P<Method>.*?)\((?P<Payload>.*)\)$", s)
         if(m != None):
-            instruction = Instruction(
-                0,
+            instruction = Instruction.Create(
                 1,
-                time.time(),
                 m.group("Service"),
                 m.group("Method"),
                 Instruction._parse_payload(m.group("Payload"))
@@ -79,3 +150,8 @@ class Instruction(object):
             return s
         else:
             raise Exception("Invalid payload format")
+
+    @staticmethod
+    def _generate_ident():
+        ident = uuid.uuid4()
+        return ident.hex
