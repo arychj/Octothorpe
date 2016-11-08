@@ -1,22 +1,38 @@
+import json, time
+
+from .Database.Statement import Statement
 
 class Event:
-    _id = None
-    _instruction = None
-
-    Service = None
-    Type = None
-    Payload = None
-
-    def __init__(self, instruction, service, type, payload):
-        self._instruction = instruction
-
+    def __init__(self, id, instruction, service, type, payload, emitted_on):
+        self.Id = id
+        self.Instruction = instruction
         self.Service = service
         self.Type = type
         self.Payload = payload
+        self.EmittedOn = emitted_on
 
-        self.Log()
+        if(self.Id == None):
+            self.CreateRecord()
 
-    def Log(self):
-        #log event to database and get id
+    def CreateRecord(self):
+        statement = Statement.Get("Events/Create")
+        result = statement.Execute({
+            "id_instruction": self.Instruction.Id,
+            "service": self.Service,
+            "type": self.Type,
+            "payload": json.dumps(self.Payload),
+            "emitted_on": Statement.FormatDatetime(self.EmittedOn)
+        })
 
-        self._id = 5000
+        self._id = result.LastId
+
+    @staticmethod
+    def Create(instruction, service, type, payload):
+        return Event(
+            None,
+            instruction,
+            service,
+            type,
+            payload,
+            time.time()
+        )
