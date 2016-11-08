@@ -1,8 +1,10 @@
 import json, time
 
 from .Database.Statement import Statement
+from .Log import Log
 
 class Event:
+
     def __init__(self, id, instruction, service, type, payload, emitted_on):
         self.Id = id
         self.Instruction = instruction
@@ -28,7 +30,7 @@ class Event:
 
     @staticmethod
     def Create(instruction, service, type, payload):
-        return Event(
+        event = Event(
             None,
             instruction,
             service,
@@ -36,3 +38,8 @@ class Event:
             payload,
             time.time()
         )
+        
+        Log.Debug(f"Created event {event.Service}/{event.Type}:{event.Id}")
+
+        return event
+

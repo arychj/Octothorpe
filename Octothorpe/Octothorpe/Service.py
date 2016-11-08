@@ -26,7 +26,6 @@ class Service(metaclass=ABCMeta):
         if(event_type in self._emitted_event_types):
             Log.Debug(f"Event '{event_type}' emitted by {self._instruction.Service}.{self._instruction.Method}()")
 
-            #log event
             event = Event.Create(
                 self._instruction,
                 self.__class__.__name__, 
