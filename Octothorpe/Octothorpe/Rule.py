@@ -1,6 +1,7 @@
 import json
 
 from .Database.Statement import Statement
+from .Log import Log
 
 class Rule:
     
@@ -38,6 +39,8 @@ class Rule:
                     row["ConsumingMethod"],
                     row["PayloadTransform"]
                 ))
+
+        Log.Debug(f"Found {result.Count} matching rules for {event.Service}/{event.Type}")
 
         return rules
 

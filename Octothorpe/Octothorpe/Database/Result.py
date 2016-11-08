@@ -7,3 +7,7 @@ class Result:
     @property
     def HasRows(self):
         return ((self.Rows != None) and (len(self.Rows) > 0))
+
+    @property
+    def Count(self):
+        return (0 if self.Rows == None else len(self.Rows))
