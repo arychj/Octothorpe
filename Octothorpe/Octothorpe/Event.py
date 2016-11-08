@@ -24,7 +24,7 @@ class Event:
             "emitted_on": Statement.FormatDatetime(self.EmittedOn)
         })
 
-        self._id = result.LastId
+        self.Id = result.LastId
 
     @staticmethod
     def Create(instruction, service, type, payload):
