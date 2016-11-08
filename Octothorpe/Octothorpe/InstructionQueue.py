@@ -29,8 +29,10 @@ class InstructionQueue:
     @classmethod
     def Enqueue(cls, instruction):
         #check if has space, else db
-
-        cls._queue.put(instruction)
+        if(cls._queue.qsize() < 50):
+            cls._queue.put(instruction)
+        else:
+            pass
 
     @classmethod
     def Dequeue(cls):
@@ -49,7 +51,26 @@ class InstructionQueue:
 
     @classmethod
     def _poll_for_instructions(cls):
+        return
+
+        statement = Statement.Get("Instructions/GetQueued")
         while(cls._poll):
-            #get queue size up to 50
+            result = statement.Execute({
+               "count": 50 - cls._queue.qsize()            
+            })
+
+            if(result.HasRows):
+                for row in rows:
+                    cls._queue.Enqueue(Instruction(
+                        row["Id"],
+                        row["Ident"],
+                        row["Level"],
+                        row["Service"],
+                        row["Method"],
+                        row["Payload"],
+                        row["GivenOn"],
+                        row["CompletedOn"]
+                    ))
+
             time.sleep(1)
 
