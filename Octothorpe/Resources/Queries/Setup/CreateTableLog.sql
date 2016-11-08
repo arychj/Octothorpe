@@ -1,4 +1,4 @@
-CREATE TABLE tblLogSystem(
+CREATE TABLE tblLog(
 	id			INTEGER PRIMARY KEY,
 	Type		TEXT,
 	Record		TEXT

@@ -7,7 +7,7 @@ class Event:
     Type = None
     Payload = None
 
-    def __init__(self, service, type, instruction, payload):
+    def __init__(self, instruction, service, type, payload):
         self._instruction = instruction
 
         self.Service = service

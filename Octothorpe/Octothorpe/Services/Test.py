@@ -8,6 +8,9 @@ class Test(Service):
     def _emitted_event_types(self):
         return ["emission"]
 
+    def Print(self, words):
+        self.Log(f"{self._instruction.ShortTag} > Print: {words}")
+
     def Echo(self, **kwargs):
         s = ", ".join(["%s=%s" % (k, v) for (k, v) in kwargs.items()])
         self.Log(f"{self._instruction.ShortTag} > Echo: {s}")

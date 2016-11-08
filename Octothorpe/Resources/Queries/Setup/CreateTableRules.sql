@@ -1,7 +1,9 @@
 CREATE TABLE tblRules(
 	id					INTEGER PRIMARY KEY,
-	id_ServiceTriggerer	INTEGER,
-	id_ServiceReceiver	INTEGER,
+	ProducingService   	TEXT,
 	EventType			TEXT,
-	Transform			TEXT
+    ConsumingService    TEXT,
+    ConsumingMethod     TEXT,
+	PayloadTransform	TEXT,
+    IsActive            BOOLEAN
 )

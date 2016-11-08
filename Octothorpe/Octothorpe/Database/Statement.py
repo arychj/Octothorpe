@@ -15,6 +15,7 @@ class Statement:
     def _shared_cursor(cls):
         if(cls._cursor == None):
             cls._connection = sqlite3.connect(Config.GetString("database/path"), check_same_thread=False)
+            cls._connection.row_factory = sqlite3.Row
             cls._cursor = cls._connection.cursor()
 
         return cls._cursor

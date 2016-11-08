@@ -5,6 +5,7 @@ from importlib import import_module
 from .Event import Event
 from .Instruction import Instruction
 from .Log import Log
+from .Rule import Rule
 
 class Service(metaclass=ABCMeta):
     _queue = None
@@ -25,6 +26,7 @@ class Service(metaclass=ABCMeta):
         if(event_type in self._emitted_event_types):
             Log.Debug(f"Event '{event_type}' emitted by {self._instruction.Service}.{self._instruction.Method}()")
 
+            #log event
             event = Event(
                 self._instruction,
                 self.__class__.__name__, 
@@ -32,18 +34,13 @@ class Service(metaclass=ABCMeta):
                 payload
             )
 
-            #log event
-            #get all rules that have hook on event
-            #generate instruction for applicable services
-            for method in ["Echo"]:
-                #create instruction record
-                id = 5000
-                payload = event.Payload
+            rules = Rule.GetMatches(event)
+            for rule in rules:
                 instruction = Instruction.Create(
                     self._instruction.Level + 1, 
-                    "Test", 
-                    method, 
-                    payload
+                    rule.Service, 
+                    rule.Method, 
+                    rule.PreparePayload(event)
                 )
 
                 Service._queue.Enqueue(instruction)

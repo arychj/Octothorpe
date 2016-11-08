@@ -30,7 +30,7 @@ class Log:
         type = f"[{e.__class__.__name__}]"
         message = str(e)
 
-        cls._console_write("fatal", (f"{type:20}{location:20}{message}"))
+        cls._console_write("FATAL", (f"{type:20}{location:20}{message}"))
 
     @classmethod
     def _console_write(cls, type, message):
