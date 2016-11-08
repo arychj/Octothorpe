@@ -29,14 +29,15 @@ class Rule:
             "event_type": event.Type
         })
 
-        for row in result.Rows:
-            rules.append(Rule(
-                row["Id"],
-                event.Type,
-                row["ConsumingService"],
-                row["ConsumingMethod"],
-                row["PayloadTransform"]
-            ))
+        if(result.HasRows):
+            for row in result.Rows:
+                rules.append(Rule(
+                    row["Id"],
+                    event.Type,
+                    row["ConsumingService"],
+                    row["ConsumingMethod"],
+                    row["PayloadTransform"]
+                ))
 
         return rules
 
