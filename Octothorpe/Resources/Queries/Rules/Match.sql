@@ -1,5 +1,5 @@
 SELECT  id as Id,
-        ConsumingService.
+        ConsumingService,
         ConsumingMethod,
         PayloadTransform
 FROM    tblRules
