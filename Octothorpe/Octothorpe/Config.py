@@ -41,6 +41,13 @@ class Config():
             cls._load_config()
 
         return cls._config.find(key).text
+    
+    @classmethod
+    def _raw(cls, key):
+        if(cls._config == None):
+            cls._load_config()
+
+        return cls._config.findall(key)
 
     @classmethod
     def _load_config(cls):
@@ -50,3 +57,4 @@ class Config():
             with open(cls._configfile) as _configfile:
                 tree = ET.parse(_configfile)
                 cls._config = tree.getroot()
+

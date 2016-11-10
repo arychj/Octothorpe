@@ -1,7 +1,7 @@
 import sys, threading
 
+from .Injector import Injector
 from .InstructionQueue import InstructionQueue
-from .Server import Server
 from .Service import Service
 
 class Manager:
@@ -11,12 +11,12 @@ class Manager:
         Service._queue = InstructionQueue
 
         InstructionQueue.Start()
-        Server.Start()
+        Injector.StartAll()
 
     @staticmethod
     def Stop():
         InstructionQueue.Stop()
-        Server.Stop()
+        Injector.StopAll()
 
     @staticmethod
     def Queue(instruction):

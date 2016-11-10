@@ -13,6 +13,7 @@ class Instruction(object):
         self.Service = service
         self.Method = method
         self.Payload = Instruction._parse_payload(payload)
+        self.Result = None
         self.GivenOn = given_on
         self.ProcessingOn = None
         self.CompletedOn = completed_on
@@ -62,6 +63,10 @@ class Instruction(object):
             return None
         else:
             return self.ProcessingOn - self.GivenOn
+
+    @property
+    def IsComplete(self):
+        return (self.CompletedOn != None)
 
     def CreateRecord(self):
         self.Ident = Instruction._generate_ident()

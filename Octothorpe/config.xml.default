@@ -13,8 +13,9 @@
         </queries>
     </database>
     <services>
-        <directories>
-            <directory></directory>
-        </directories>
+        <service name="Test" />
     </services>
+    <injectors>
+        <injector name="HttpInjector" />
+    </injectors>
 </config>

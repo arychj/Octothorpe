@@ -62,9 +62,9 @@ class Service(metaclass=ABCMeta):
 
         method = getattr(service, instruction.Method, None)
         if(instruction.Payload == None):
-            method()
+            instruction.Result = method()
         else:
-            method(**instruction.Payload)
+            instruction.Result = method(**instruction.Payload)
 
     @staticmethod
     @lru_cache(maxsize=32)

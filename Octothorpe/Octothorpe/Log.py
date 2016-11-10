@@ -11,9 +11,15 @@ class Log:
     @classmethod
     def Entry(cls, message):
         #temporary
-        cls._console_write("event", message)
+        cls._console_write("entry", message)
         return None
     
+    @classmethod
+    def System(cls, message):
+        #temporary
+        cls._console_write("system", message, Color.Yellow)
+        return None
+
     @classmethod
     def Error(cls, message):
         #Color.Yellow
@@ -45,9 +51,12 @@ class Log:
         return datetime.datetime.now().strftime(format)
 
 class Color:
-    Blue = '\033[94m'
+    Red = '\033[91m'
     Green = '\033[92m'
     Yellow = '\033[93m'
-    Red = '\033[91m'
+    Blue = '\033[94m'
+    Magenta = '\033[95m'
+    Cyan = '\033[96m'
+    White = '\033[97m'
     Reset = '\033[0m'
 
