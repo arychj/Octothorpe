@@ -7,3 +7,5 @@ CREATE TABLE tblRules(
 	PayloadTransform	TEXT,
     IsActive            BOOLEAN
 )
+
+CREATE INDEX tblRules_PS-ET-CS-CM on tblRules (ProducingService, EventType)

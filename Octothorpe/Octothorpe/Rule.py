@@ -5,11 +5,12 @@ from .Log import Log
 
 class Rule:
     
-    def __init__(self, id, event_type, service, method, payload_transform):
+    def __init__(self, id, producing_service, event_type, consuming_service, consuming_method, payload_transform):
         self.Id = id
+        self.ProducingService = producing_service
         self.EventType = event_type
-        self.Service = service
-        self.Method = method
+        self.ConsumingService = consuming_service
+        self.ConsumingMethod = consuming_method
         self.PayloadTransform = payload_transform
         
     def PreparePayload(self, event):
@@ -19,6 +20,12 @@ class Rule:
             sPayload = sPayload.replace(f"|{k}|", v)
 
         return json.loads(sPayload)
+
+    def Deactivate(self):
+        statement = Statement.Get("Rules/Deactivate")
+        statement.Execute({
+            "id": self.Id
+        })
 
     @staticmethod
     def GetMatches(event):
@@ -34,6 +41,7 @@ class Rule:
             for row in result.Rows:
                 rules.append(Rule(
                     row["Id"],
+                    event.Service,
                     event.Type,
                     row["ConsumingService"],
                     row["ConsumingMethod"],
@@ -43,4 +51,24 @@ class Rule:
         Log.Debug(f"Found {result.Count} matching rules for {event.Service}/{event.Type}")
 
         return rules
+
+    @staticmethod
+    def Create(producing_service, event_type, consuming_service, consuming_method, payload_transform):
+        statment = Statement.Get("Rules/Create")
+        result = statment.Execute({
+            "producing_service": producing_service,
+            "event_type": event_type,
+            "consuming_service": consuming_service,
+            "consuming_method": consuming_method,
+            "payload_transform": payload_transform
+        })
+
+        return Rule(
+            result.LastId,
+            producing_service,
+            event_type,
+            consuming_service,
+            consuming_method,
+            payload_transform
+        )
 

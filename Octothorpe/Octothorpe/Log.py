@@ -6,16 +6,17 @@ class Log:
     @classmethod
     def Debug(cls, message):
         if(Config.GetBool("debug")):
-            cls._console_write("debug", message)
+            cls._console_write("debug", message, Color.Blue)
 
     @classmethod
-    def Event(cls, message):
+    def Entry(cls, message):
         #temporary
-        cls._console_write("EVENT", message)
+        cls._console_write("event", message)
         return None
     
     @classmethod
     def Error(cls, message):
+        #Color.Yellow
         return None
     
     @classmethod
@@ -30,15 +31,23 @@ class Log:
         type = f"[{e.__class__.__name__}]"
         message = str(e)
 
-        cls._console_write("FATAL", (f"{type:20}{location:20}{message}"))
+        cls._console_write("fatal", (f"{type:20}{location:20}{message}"), Color.Red)
 
     @classmethod
-    def _console_write(cls, type, message):
-        type = f"[{type}]"
-        print(f"{type:10} [{cls._get_timestamp()}]: {message}")
+    def _console_write(cls, type, message, color = ""):
+        type = f"[{type}]".upper()
+        print(f"{color}{type:10}{Color.Reset} [{cls._get_timestamp()}]: {message}")
 
     @classmethod
     def _get_timestamp(cls):
         format = Config.GetString("logging/time_format");
 
         return datetime.datetime.now().strftime(format)
+
+class Color:
+    Blue = '\033[94m'
+    Green = '\033[92m'
+    Yellow = '\033[93m'
+    Red = '\033[91m'
+    Reset = '\033[0m'
+

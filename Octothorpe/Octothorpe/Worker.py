@@ -26,7 +26,7 @@ class Worker(Thread):
                 Service.Call(instruction)
                 instruction.Complete()
 
-                Log.Debug(f"[{self._name}] Finished processing instruction {instruction.Id} in {instruction.ExecutionTime:.2f} seconds")
+                Log.Debug(f"[{self._name}] Finished processing instruction {instruction.Id} in {instruction.ProcessingTime:.2f} seconds (waited {instruction.WaitingTime:.2f})")
             except Exception as e:
                 instruction.Fail()
                 Log.Exception(e)

@@ -19,7 +19,7 @@ class Test(Service):
 
     def Test(self, text):
         i = randint(0,5)
-        time.sleep(i)
+#        time.sleep(i)
 
         self.Log(f"{self._instruction.ShortTag} > Test: {text} [slept for {i}]")
 

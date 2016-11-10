@@ -1,3 +1,4 @@
 UPDATE  tblInstructions
-SET     CompletedOn = :completed_on
+SET     ProcessingOn = :processing_on,
+        CompletedOn = :completed_on
 WHERE   id = :id

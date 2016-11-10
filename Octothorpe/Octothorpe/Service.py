@@ -1,5 +1,6 @@
 import inspect, time
 from abc import ABCMeta, abstractmethod
+from functools import lru_cache
 from importlib import import_module
 
 from .Event import Event
@@ -37,8 +38,8 @@ class Service(metaclass=ABCMeta):
             for rule in rules:
                 instruction = Instruction.Create(
                     self._instruction.Level + 1, 
-                    rule.Service, 
-                    rule.Method, 
+                    rule.ConsumingService, 
+                    rule.ConsumingMethod, 
                     rule.PreparePayload(event)
                 )
 
@@ -48,11 +49,13 @@ class Service(metaclass=ABCMeta):
         Log.Debug(message)
 
     def Log(self, message):
-        Log.Event(message)
+        Log.Entry(message)
 
     @staticmethod
     def Call(instruction):
-        service_type = getattr(import_module(f".Services.{instruction.Service}", "Octothorpe"), instruction.Service)
+        instruction.Processing()
+
+        service_type = Service._get_service(instruction.Service)
 
         service = service_type()
         service._instruction = instruction
@@ -62,3 +65,8 @@ class Service(metaclass=ABCMeta):
             method()
         else:
             method(**instruction.Payload)
+
+    @staticmethod
+    @lru_cache(maxsize=32)
+    def _get_service(name):
+        return getattr(import_module(f".Services.{name}", "Octothorpe"), name)

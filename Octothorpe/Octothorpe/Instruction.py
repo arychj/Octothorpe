@@ -6,7 +6,7 @@ from .Log import Log
 
 class Instruction(object):
     
-    def __init__(self, id, ident, level, service, method, payload, given_on, completed_on = None):
+    def __init__(self, id, ident, level, service, method, payload, given_on, processing_on = None, completed_on = None):
         self.Id = id
         self.Ident = ident
         self.Level = level
@@ -14,6 +14,7 @@ class Instruction(object):
         self.Method = method
         self.Payload = Instruction._parse_payload(payload)
         self.GivenOn = given_on
+        self.ProcessingOn = None
         self.CompletedOn = completed_on
 
         if(self.Id == None):
@@ -49,11 +50,18 @@ class Instruction(object):
             return f"{self.ShortIdent}:{self.Id}/{self.Level}/{self.Priority}"
 
     @property
-    def ExecutionTime(self):
-        if(self.GivenOn == None or self.CompletedOn == None):
+    def ProcessingTime(self):
+        if(self.ProcessingOn == None or self.CompletedOn == None):
             return None
         else:
-            return self.CompletedOn - self.GivenOn
+            return self.CompletedOn - self.ProcessingOn
+
+    @property
+    def WaitingTime(self):
+        if(self.GivenOn == None or self.ProcessingOn == None):
+            return None
+        else:
+            return self.ProcessingOn - self.GivenOn
 
     def CreateRecord(self):
         self.Ident = Instruction._generate_ident()
@@ -70,6 +78,9 @@ class Instruction(object):
 
         self.Id = result.LastId
 
+    def Processing(self):
+        self.ProcessingOn = time.time()
+
     def Complete(self):
         if(self.Id != None):
             self.CompletedOn = time.time()
@@ -77,6 +88,7 @@ class Instruction(object):
             statement = Statement.Get("Instructions/Complete")
             statement.Execute({
                 "id": self.Id,
+                "processing_on": Statement.FormatDatetime(self.ProcessingOn),
                 "completed_on": Statement.FormatDatetime(self.CompletedOn)
             })
         else:
@@ -108,8 +120,7 @@ class Instruction(object):
             service,
             method,
             payload,
-            time.time(),
-            None
+            time.time()
         )
 
         Log.Debug(f"Created instruction {instruction.ShortTag}")
@@ -141,7 +152,7 @@ class Instruction(object):
 
     @staticmethod
     def _parse_payload(s):
-        if(s == None):
+        if((s == None) or (len(s) == 0)):
             return None
         elif(isinstance(s, str)):
             Log.Debug(f"Decoding JSON payload: {s}")

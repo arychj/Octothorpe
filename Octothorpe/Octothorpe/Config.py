@@ -1,5 +1,7 @@
 import xml.etree.ElementTree as ET
 
+from functools import lru_cache
+
 class Config():
     _configfile = None
     _config = None
@@ -9,15 +11,14 @@ class Config():
         cls._configfile = f
 
     @classmethod
+    @lru_cache(maxsize=32)
     def GetString(cls, key):
-        if(cls._config == None):
-            cls.LoadConfig()
-
-        return cls._config.find(key).text
+        return cls._get_setting(key)
 
     @classmethod
+    @lru_cache(maxsize=32)
     def GetInt(cls, key):
-        val = cls.GetString(key)
+        val = cls._get_setting(key)
 
         if(val != None):
             val = int(val)
@@ -25,8 +26,9 @@ class Config():
         return val
 
     @classmethod
+    @lru_cache(maxsize=32)
     def GetBool(cls, key):
-        val = cls.GetString(key)
+        val = cls._get_setting(key)
 
         if(val != None):
             val = (True if val.lower() == "true" else False)
@@ -34,7 +36,14 @@ class Config():
         return val
 
     @classmethod
-    def LoadConfig(cls):
+    def _get_setting(cls, key):
+        if(cls._config == None):
+            cls._load_config()
+
+        return cls._config.find(key).text
+
+    @classmethod
+    def _load_config(cls):
         if(cls._configfile == None):
             raise Exception("no config file specified.")
         else:
