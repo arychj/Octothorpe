@@ -11,7 +11,7 @@ class InstructionQueue:
     @classmethod
     def Start(cls):
         for name in range(Config.GetInt("processing/worker_threads")):
-            Worker(cls, name)
+            Worker(cls, str(name))
 
         cls._start_polling()
 

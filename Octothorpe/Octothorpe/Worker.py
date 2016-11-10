@@ -21,12 +21,12 @@ class Worker(Thread):
         instruction = self._queue.Dequeue()
         while(instruction.Id != -1):
             try:
-                Log.Debug(f"[{self._name}] Started processing instruction {instruction.Id}...")
+                Log.Debug(f"Started processing instruction {instruction.Id}...", tag=self._name)
 
                 Service.Call(instruction)
                 instruction.Complete()
 
-                Log.Debug(f"[{self._name}] Finished processing instruction {instruction.Id} in {instruction.ProcessingTime:.2f} seconds (waited {instruction.WaitingTime:.2f})")
+                Log.Debug(f"Finished processing instruction {instruction.Id} in {instruction.ProcessingTime:.2f} seconds (waited {instruction.WaitingTime:.2f})", tag=self._name)
             except Exception as e:
                 instruction.Fail()
                 Log.Exception(e)

@@ -3,14 +3,20 @@ from abc import ABCMeta, abstractmethod
 from functools import lru_cache
 from importlib import import_module
 
+from .Config import Config
+from .DynamicModule import DynamicModule
 from .Event import Event
 from .Instruction import Instruction
 from .Log import Log
 from .Rule import Rule
 
-class Service(metaclass=ABCMeta):
+class Service(DynamicModule, metaclass=ABCMeta):
     _queue = None
     _instruction = None
+
+    @property
+    def _module_type(self):
+        return "service"
 
     @property
     def _emitted_event_types(self):
@@ -45,9 +51,6 @@ class Service(metaclass=ABCMeta):
 
                 Service._queue.Enqueue(instruction)
 
-    def Debug(self, message):
-        Log.Debug(message)
-
     def Log(self, message):
         Log.Entry(message)
 
@@ -69,4 +72,11 @@ class Service(metaclass=ABCMeta):
     @staticmethod
     @lru_cache(maxsize=32)
     def _get_service(name):
-        return getattr(import_module(f".Services.{name}", "Octothorpe"), name)
+        xService = Config._raw(f"services/service[@name='{name}']")
+        if(len(xService) == 1):
+            xService = xService[0]
+            module = (xService.attrib["module"] if ('module' in xService.attrib) else xService    .attrib["name"])
+
+            return getattr(import_module(f".Services.{module}", "Octothorpe"), module[module.find('.') + 1:])
+        else:
+            return None

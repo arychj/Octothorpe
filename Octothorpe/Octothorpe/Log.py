@@ -4,29 +4,29 @@ from .Config import Config
 
 class Log:
     @classmethod
-    def Debug(cls, message):
+    def Debug(cls, message, tag=""):
         if(Config.GetBool("debug")):
-            cls._console_write("debug", message, Color.Blue)
+            cls._console_write("debug", message, Color.Blue, tag)
 
     @classmethod
-    def Entry(cls, message):
+    def Entry(cls, message, tag=""):
         #temporary
-        cls._console_write("entry", message)
+        cls._console_write("entry", message, tag)
         return None
     
     @classmethod
-    def System(cls, message):
+    def System(cls, message, tag=""):
         #temporary
-        cls._console_write("system", message, Color.Yellow)
+        cls._console_write("system", message, Color.Yellow, tag)
         return None
 
     @classmethod
-    def Error(cls, message):
+    def Error(cls, message, tag=""):
         #Color.Yellow
         return None
     
     @classmethod
-    def Exception(cls, e):
+    def Exception(cls, e, tag=""):
         tb = e.__traceback__
         while(tb.tb_next != None):
             tb = tb.tb_next
@@ -37,12 +37,16 @@ class Log:
         type = f"[{e.__class__.__name__}]"
         message = str(e)
 
-        cls._console_write("fatal", (f"{type:20}{location:20}{message}"), Color.Red)
+        cls._console_write("fatal", (f"{type:20}{location:20}{message}"), Color.Red, tag)
 
     @classmethod
-    def _console_write(cls, type, message, color = ""):
+    def _console_write(cls, type, message, color="", tag=""):
         type = f"[{type}]".upper()
-        print(f"{color}{type:10}{Color.Reset} [{cls._get_timestamp()}]: {message}")
+        
+        if(len(tag) > 0):
+            tag = f"{Color.Cyan}[{tag}]{Color.Reset} "
+
+        print(f"{color}{type:10}{Color.Reset} [{cls._get_timestamp()}]: {tag}{message}")
 
     @classmethod
     def _get_timestamp(cls):

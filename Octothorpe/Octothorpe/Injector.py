@@ -4,12 +4,17 @@ from abc import ABCMeta, abstractmethod
 from importlib import import_module
 
 from .Config import Config
+from .DynamicModule import DynamicModule
 from .Instruction import Instruction
 from .InstructionQueue import InstructionQueue
 from .Log import Log
 
-class Injector(metaclass=ABCMeta):
-    
+class Injector(DynamicModule, metaclass=ABCMeta):
+   
+    @property
+    def _module_type(self):
+        return "injector"
+
     @abstractmethod
     def Start(self):
         pass
@@ -34,20 +39,15 @@ class Injector(metaclass=ABCMeta):
         return instruction.Result
 
     def Log(self, message):
-        Log.System(f"[{self._name}] {message}")
-
-    def GetSetting(self, key):
-        return self.GetSettings(key)[0].text
-
-    def GetSettings(self, key):
-        return Config._raw(f"injectors/injector[@name='{self._name}']/{key}")
+        Log.System(message, tag=self._name)
             
     @staticmethod
     def StartAll():
         xInjectors = Config._raw(f"injectors/injector")
 
         for xInjector in xInjectors:
-            injector_type = Injector._get_injector(xInjector.attrib['name'])
+            #module_name = (xInjector.attrib["module"] if ('module' in xInjector.attrib) else xInjector.attrib["name"])
+            injector_type = Injector._get_module("injector", xInjector.attrib["name"])
             
             injector = injector_type()
             injector._name = xInjector.attrib['name']
@@ -59,8 +59,4 @@ class Injector(metaclass=ABCMeta):
     @staticmethod
     def StopAll():
         pass
-
-    @staticmethod
-    def _get_injector(name):
-        return getattr(import_module(f".Injectors.{name}", "Octothorpe"), name[name.find('.') + 1:])
 
