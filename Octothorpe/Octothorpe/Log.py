@@ -17,12 +17,13 @@ class Log:
     @classmethod
     def System(cls, message, tag=""):
         #temporary
-        cls._console_write("system", message, Color.Yellow, tag)
+        cls._console_write("system", message, Color.Cyan, tag)
         return None
 
     @classmethod
     def Error(cls, message, tag=""):
-        #Color.Yellow
+        #log to db
+        cls._console_write("error", message, Color.Yellow, tag)
         return None
     
     @classmethod
@@ -44,7 +45,7 @@ class Log:
         type = f"[{type}]".upper()
         
         if(len(tag) > 0):
-            tag = f"{Color.Cyan}[{tag}]{Color.Reset} "
+            tag = f"{Color.Magenta}[{tag}]{Color.Reset} "
 
         print(f"{color}{type:10}{Color.Reset} [{cls._get_timestamp()}]: {tag}{message}")
 
