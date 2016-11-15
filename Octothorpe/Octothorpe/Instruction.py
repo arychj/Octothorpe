@@ -15,7 +15,7 @@ class Instruction(object):
         self.Payload = Instruction._parse_payload(payload)
         self.Result = None
         self.GivenOn = given_on
-        self.ProcessingOn = None
+        self.ProcessingOn = processing_on
         self.CompletedOn = completed_on
 
         if(self.Id == None):
@@ -138,7 +138,7 @@ class Instruction(object):
 
     @staticmethod
     def GetStopInstruction():
-        return Instruction(-1, 0, 0, None, None, None)
+        return Instruction(-1, 0, 0, None, None, None, None)
 
     @staticmethod
     def Parse(s):

@@ -2,6 +2,7 @@ import threading, time, queue
 
 from .Config import Config
 from .Instruction import Instruction
+from .Log import Log
 from .Worker import Worker
 
 class InstructionQueue:
@@ -28,6 +29,8 @@ class InstructionQueue:
 
     @classmethod
     def Enqueue(cls, instruction):
+        Log.Debug("Instruction queued")
+
         #check if has space, else db
         if(cls._queue.qsize() < 50):
             cls._queue.put(instruction)

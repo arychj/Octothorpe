@@ -1,6 +1,7 @@
 import threading, time
 
 from abc import ABCMeta, abstractmethod
+from functools import lru_cache
 from importlib import import_module
 
 from .Config import Config
@@ -23,6 +24,7 @@ class DynamicModule(metaclass=ABCMeta):
         return Config._raw(f"{self._module_type}s/{self._module_type}[@name='{self._name}']/{key}")
 
     @staticmethod
+    @lru_cache(maxsize=64)
     def _get_module(type, name):
         xModule = Config._raw(f"{type}s/{type}[@name='{name}']")
         if(len(xModule) == 1):
