@@ -30,7 +30,7 @@ class Service(DynamicModule, metaclass=ABCMeta):
             return list(inspect.signature(method).parameters)
 
     def Emit(self, event_type, payload):
-        if(event_type in self._emitted_event_types):
+        if((event_type == self._instruction.Method) or (event_type in self._emitted_event_types)):
             Log.Debug(f"Event '{event_type}' emitted by {self._instruction.Service}.{self._instruction.Method}()")
 
             event = Event.Create(
@@ -50,6 +50,8 @@ class Service(DynamicModule, metaclass=ABCMeta):
                 )
 
                 Service._queue.Enqueue(instruction)
+        else:
+            Log.Error(f"Unknown event type '{event_type}' emitted by service {self._instruction.Service}.{self._instruction.Method}()")
 
     def Log(self, message):
         Log.Entry(message)
@@ -58,7 +60,7 @@ class Service(DynamicModule, metaclass=ABCMeta):
     def Call(instruction):
         instruction.Processing()
 
-        service_type = Service._get_service(instruction.Service)
+        service_type = Service._get_module("service", instruction.Service)
 
         service = service_type()
         service._instruction = instruction
@@ -69,14 +71,6 @@ class Service(DynamicModule, metaclass=ABCMeta):
         else:
             instruction.Result = method(**instruction.Payload)
 
-    @staticmethod
-    @lru_cache(maxsize=32)
-    def _get_service(name):
-        xService = Config._raw(f"services/service[@name='{name}']")
-        if(len(xService) == 1):
-            xService = xService[0]
-            module = (xService.attrib["module"] if ('module' in xService.attrib) else xService    .attrib["name"])
+        if(instruction.Result != None):
+            service.Emit(f"{instruction.Method}", instruction.Result)
 
-            return getattr(import_module(f".Services.{module}", "Octothorpe"), module[module.find('.') + 1:])
-        else:
-            return None
