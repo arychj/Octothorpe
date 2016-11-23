@@ -24,7 +24,7 @@ class Injector(DynamicModule, metaclass=ABCMeta):
     def Stop(self):
         pass
 
-    def Call(self, service=None, method=None, payload=None, instruction=None):
+    def Inject(self, service=None, method=None, payload=None, instruction=None):
         if(service and method and payload):
             instruction = Instruction.Create(
                 1,

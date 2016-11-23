@@ -29,7 +29,7 @@ class SlackInjector(Injector):
         if(match != None):
             self.Debug(f"Matched to command '{command.attrib['name']}'")
 
-            response = self.Call(
+            response = self.Inject(
                 command.find("service").text,
                 command.find("method").text,
                 match.groupdict()
