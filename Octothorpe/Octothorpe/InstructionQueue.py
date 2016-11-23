@@ -18,6 +18,8 @@ class InstructionQueue:
 
     @classmethod
     def Stop(cls):
+        Log.System("Stopping workers")
+
         cls._poll = False
 
         for _ in range(Config.GetInt("processing/worker_threads")):
@@ -29,14 +31,15 @@ class InstructionQueue:
 
     @classmethod
     def Enqueue(cls, instruction):
-        if(instruction.Id != -1):
-            Log.Debug("Instruction queued")
+        if(instruction):
+            if(instruction.Id != -1):
+                Log.Debug(f"Queued instruction {instruction.ShortIdent}")
 
-        #check if has space, else db
-        if(cls._queue.qsize() < 50):
-            cls._queue.put(instruction)
-        else:
-            pass
+            #check if has space, else db
+            if(cls._queue.qsize() < 50):
+                cls._queue.put(instruction)
+            else:
+                pass
 
     @classmethod
     def Dequeue(cls):

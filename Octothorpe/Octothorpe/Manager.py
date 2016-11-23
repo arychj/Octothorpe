@@ -2,6 +2,7 @@ import sys, threading
 
 from .Injector import Injector
 from .InstructionQueue import InstructionQueue
+from .Log import Log
 from .Service import Service
 
 class Manager:
@@ -15,6 +16,8 @@ class Manager:
 
     @staticmethod
     def Stop():
+        Log.System("Stopping system")
+
         InstructionQueue.Stop()
         Injector.StopAll()
 
@@ -25,4 +28,3 @@ class Manager:
     @staticmethod
     def Process(instruction):
         Service.Call(instruction)
-
