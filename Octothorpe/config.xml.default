@@ -16,6 +16,20 @@
         <service name="Test" />
     </services>
     <injectors>
+        <injector name="CommandLineInjector">
+            <stop_signals>stop,exit,quit,end</stop_signals>
+        </injector>
         <injector name="HttpInjector" />
+        <injector name="SlackInjector" module="Slack.SlackInjector">
+            <api_key>xxx</api_key>
+            <read_interval>1</read_interval>
+            <commands>
+                <command name="echo">
+                    <pattern><![CDATA[^echo this: (?P<text>.*)$]]></pattern>
+                    <service>Test</service>
+                    <method>Echo</method>
+                </command>
+            </commands>
+        </injector>
     </injectors>
 </config>
