@@ -32,3 +32,5 @@ class Worker(Thread):
                 self._queue.Complete()
 
             instruction = self._queue.Dequeue()
+
+        Log.Debug("Stopping", tag=self.name)

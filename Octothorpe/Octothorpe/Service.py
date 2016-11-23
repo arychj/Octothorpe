@@ -72,5 +72,5 @@ class Service(DynamicModule, metaclass=ABCMeta):
             instruction.Result = method(**instruction.Payload)
 
         if(instruction.Result != None):
-            service.Emit(f"{instruction.Method}", instruction.Result)
+            service.Emit(f"_{instruction.Method}.lower()", instruction.Result)
 

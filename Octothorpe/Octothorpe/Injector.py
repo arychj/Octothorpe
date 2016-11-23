@@ -10,6 +10,7 @@ from .InstructionQueue import InstructionQueue
 from .Log import Log
 
 class Injector(DynamicModule, metaclass=ABCMeta):
+    _active_injectors = []
    
     @property
     def _module_type(self):
@@ -54,9 +55,12 @@ class Injector(DynamicModule, metaclass=ABCMeta):
             t = threading.Thread(target=injector.Start)
             t.start()
 
+            Injector._active_injectors.append(injector)
+
             Log.System(f"Injector '{injector._name}' started")
 
     @staticmethod
     def StopAll():
-        pass
+        for injector in Injector._active_injectors:
+            injector.Stop()
 

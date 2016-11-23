@@ -29,7 +29,8 @@ class InstructionQueue:
 
     @classmethod
     def Enqueue(cls, instruction):
-        Log.Debug("Instruction queued")
+        if(instruction.Id != -1):
+            Log.Debug("Instruction queued")
 
         #check if has space, else db
         if(cls._queue.qsize() < 50):
