@@ -8,6 +8,7 @@ from .DynamicModule import DynamicModule
 from .Instruction import Instruction
 from .InstructionQueue import InstructionQueue
 from .Log import Log
+from .Shim import Shim
 
 class Injector(DynamicModule, metaclass=ABCMeta):
     _active_injectors = []
@@ -24,14 +25,11 @@ class Injector(DynamicModule, metaclass=ABCMeta):
     def Stop(self):
         pass
 
-    def Inject(self, service=None, method=None, payload=None, instruction=None):
-        if(service and method and payload):
-            instruction = Instruction.Create(
-                1,
-                service,
-                method,
-                payload
-            )
+    def Inject(self, message):
+        result = None
+
+        shim = Shim.Get(self._shim)
+        instruction = shim.Inbound(message)
 
         if(instruction):
             InstructionQueue.Enqueue(instruction)
@@ -39,9 +37,9 @@ class Injector(DynamicModule, metaclass=ABCMeta):
             while(instruction.IsComplete == False):
                 time.sleep(0.1)
             
-            return instruction.Result
-        else:
-            Log.Error("Attempted to inject invalid instruction", tag=self._name)
+            result = shim.Outbound(instruction)
+        
+        return result
 
     def Log(self, message):
         Log.System(message, tag=self._name)
@@ -58,6 +56,7 @@ class Injector(DynamicModule, metaclass=ABCMeta):
             
             injector = injector_type()
             injector._name = xInjector.attrib['name']
+            injector._shim = (xInjector.attrib['shim'] if "shim" in xInjector.attrib else None)
 
             t = threading.Thread(target=injector.Start)
             t.daemon = True

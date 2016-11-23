@@ -28,8 +28,7 @@ class HttpInjector(Injector):
             content_len = int(self.headers.get('content-length', 0))
             post_body = self.rfile.read(content_len).decode("utf-8")
 
-            instruction = Instruction.Parse(post_body)
-            result = self.Inject(instruction=instruction)
+            result = self.Inject(post_body)
 
             self.send_response(200)
             self.send_header("Content-type", "application/json")

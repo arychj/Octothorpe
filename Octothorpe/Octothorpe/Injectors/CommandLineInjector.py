@@ -14,8 +14,8 @@ class CommandLineInjector(Injector):
                     Manager.Stop()
                     break
                 else:
-                    instruction = Instruction.Parse(line)
-                    response = self.Inject(instruction=instruction)
+                    result = self.Inject(line)
+                    print(result)
             except Exception as e:
                 self.Error(e)
 
