@@ -18,9 +18,9 @@
     <shims>
         <shim name="SlackShim">
             <commands>
-                <command name="echo">
-                    <pattern><![CDATA[^echo this: (?P<text>.*)$]]></pattern>
-                    <response_template><![CDATA[You told me to echo '{[text]}'.]]></response_template>
+                <command name="say">
+                    <pattern><![CDATA[^say (?P<words>.*)$]]></pattern>
+                    <response_template><![CDATA[You told me to say '{[words]}'.]]></response_template>
                     <service>Test</service>
                     <method>Echo</method>
                 </command>
