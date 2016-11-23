@@ -33,16 +33,3 @@ if(args.test):
         Manager.Queue(instruction)
 
 Manager.Start()
-
-while(1):
-    try:
-        line = input()
-        if(line == "stop"):
-            print("Stopping...")
-            Manager.Stop()
-            break
-        else:
-            instruction = Instruction.Parse(line)
-            Manager.Queue(instruction)
-    except Exception as e:
-        Log.Exception(e)
