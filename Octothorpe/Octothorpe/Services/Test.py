@@ -3,6 +3,8 @@ from Octothorpe.Service import Service
 from random import randint
 import time
 
+from Octothorpe.Injectors.Slack.SlackInjector import SlackInjector
+
 class Test(Service):
     @property
     def _emitted_event_types(self):
@@ -36,3 +38,9 @@ class Test(Service):
 
     def RaiseException(self):
         raise Exception("I take umbrance to your call!!!")
+
+    def Slack(self, to, message):
+        if(SlackInjector.IsValidAddress(to)):
+            SlackInjector.Send(to, message)
+        else:
+            Log.Error(f"Invalid address '{to}'")
