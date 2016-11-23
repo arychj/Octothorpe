@@ -10,6 +10,9 @@ class Shim(DynamicModule):
     def _module_type(self):
         return "shim"
 
+    def __init__(self, name):
+        self._name = name
+
     def Inbound(self, message):
         return Instruction.Parse(message)        
 
@@ -29,8 +32,7 @@ class Shim(DynamicModule):
     def Get(name):
         if(name != None):
             shim_type = Shim._get_module("shim", name)
-            shim = shim_type()
-            shim._name = name
+            shim = shim_type(name)
         else:
             shim = Shim()
 

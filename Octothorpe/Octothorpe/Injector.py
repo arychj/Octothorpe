@@ -25,6 +25,10 @@ class Injector(DynamicModule, metaclass=ABCMeta):
     def Stop(self):
         pass
 
+    def __init__(self, name, shim):
+        self._name = name
+        self._shim = shim
+
     def Inject(self, message):
         result = None
 
@@ -54,9 +58,10 @@ class Injector(DynamicModule, metaclass=ABCMeta):
         for xInjector in xInjectors:
             injector_type = Injector._get_module("injector", xInjector.attrib["name"])
             
-            injector = injector_type()
-            injector._name = xInjector.attrib['name']
-            injector._shim = (xInjector.attrib['shim'] if "shim" in xInjector.attrib else None)
+            injector = injector_type(
+                xInjector.attrib['name'],
+                (xInjector.attrib['shim'] if "shim" in xInjector.attrib else None)
+            )
 
             t = threading.Thread(target=injector.Start)
             t.daemon = True
