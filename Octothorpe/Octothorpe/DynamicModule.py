@@ -6,22 +6,21 @@ from importlib import import_module
 
 from .Config import Config
 from .Log import Log
+from .ModuleSettings import ModuleSettings
 
-class DynamicModule(metaclass=ABCMeta):
+class DynamicModule(ModuleSettings, metaclass=ABCMeta):
     
     @property
     @abstractmethod
     def _module_type(self):
         pass
 
+    @property
+    def _base_key(self):
+        return f"{self._module_type}s/{self._module_type}[@name='{self._name}']"
+
     def Debug(self, message):
         Log.Debug(message, tag=self._name)
-
-    def GetSetting(self, key):
-        return self.GetSettings(key)[0].text
-
-    def GetSettings(self, key):
-        return Config._raw(f"{self._module_type}s/{self._module_type}[@name='{self._name}']/{key}")
 
     @staticmethod
     @lru_cache(maxsize=64)

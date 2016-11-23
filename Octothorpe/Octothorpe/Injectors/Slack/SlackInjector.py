@@ -13,14 +13,14 @@ class SlackInjector(Injector):
         return SlackInjector._client
 
     def Connect(self):
-        SlackInjector.Client = SlackClient(self.GetSetting("api_key"))
+        SlackInjector.Client = SlackClient(self.GetString("api_key"))
         return SlackInjector.Client.rtm_connect()
 
     def Handle(self, channel, user, message):
         self.Debug(f"Received message from {SlackInjector._resolve_channel_id(channel, user)} ({channel}): {message[:25]}")
 
         match = None
-        commands = self.GetSettings("commands/command")
+        commands = self.GetMultiple("commands/command")
         for command in commands:
             match = re.match(command.find("pattern").text, message, re.IGNORECASE)
             if(match != None):
@@ -46,7 +46,7 @@ class SlackInjector(Injector):
         return None, None, None
 
     def Start(self):
-        read_interval = int(self.GetSetting("read_interval"))
+        read_interval = self.GetInt("read_interval")
         self._running = True
 
         if self.Connect():
