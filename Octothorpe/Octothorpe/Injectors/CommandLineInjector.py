@@ -15,7 +15,10 @@ class CommandLineInjector(Injector):
                     break
                 else:
                     result = self.Inject(line)
-                    print(result)
+                    if(result != None):
+                        print(result)
+                    else:
+                        print("Invalid instruction")
             except Exception as e:
                 self.Error(e)
 
