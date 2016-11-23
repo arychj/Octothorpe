@@ -15,6 +15,18 @@
     <services>
         <service name="Test" />
     </services>
+    <shims>
+        <shim name="SlackShim">
+            <commands>
+                <command name="echo">
+                    <pattern><![CDATA[^echo this: (?P<text>.*)$]]></pattern>
+                    <response_template><![CDATA[You told me to echo '{[text]}'.]]></response_template>
+                    <service>Test</service>
+                    <method>Echo</method>
+                </command>
+            </commands>
+        </shim>
+    </shims>
     <injectors>
         <injector name="CommandLineInjector">
             <stop_signals>stop,exit,quit,end</stop_signals>

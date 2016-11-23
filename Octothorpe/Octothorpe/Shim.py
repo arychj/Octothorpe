@@ -20,7 +20,7 @@ class Shim(DynamicModule):
         return str(instruction.Result)
 
     @classmethod
-    def CreateInstruction(service, method, payload):
+    def CreateInstruction(cls, service, method, payload):
         return Instruction.Create(
             1,
             service,
@@ -34,7 +34,7 @@ class Shim(DynamicModule):
             shim_type = Shim._get_module("shim", name)
             shim = shim_type(name)
         else:
-            shim = Shim()
+            shim = Shim(name)
 
         return shim
     

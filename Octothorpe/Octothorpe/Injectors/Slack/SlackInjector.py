@@ -19,23 +19,10 @@ class SlackInjector(Injector):
     def Handle(self, channel, user, message):
         self.Debug(f"Received message from {SlackInjector._resolve_channel_id(channel, user)} ({channel}): {message[:25]}")
 
-        match = None
-        commands = self.GetMultiple("commands/command")
-        for command in commands:
-            match = re.match(command.find("pattern").text, message, re.IGNORECASE)
-            if(match != None):
-                break
+        result = self.Inject(message)
 
-        if(match != None):
-            self.Debug(f"Matched to command '{command.attrib['name']}'")
-
-            response = self.Inject(
-                command.find("service").text,
-                command.find("method").text,
-                match.groupdict()
-            )
-
-            SlackInjector.Send(channel, response)
+        if(result != None):
+            SlackInjector.Send(channel, result)
 
     def ParsePayload(self, payload):
         if payload and len(payload) > 0:
