@@ -4,7 +4,13 @@ Octothorpe is rules engine and services framework. Basically it is a partial IFT
 ---
 
 ### Requirements
-* Python 3.6
+* Base
+  * Python 3.6
+* Slack injector
+  * requests
+  * six
+  * websockets
+  * websocket-client
 
 ### Usage
 Setup:
