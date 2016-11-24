@@ -16,6 +16,10 @@ class Service(DynamicModule, metaclass=ABCMeta):
     @property
     def _module_type(self):
         return "service"
+    
+    @property
+    def _name(self):
+        return self.__class__.__name__
 
     @property
     def _emitted_event_types(self):
@@ -58,6 +62,9 @@ class Service(DynamicModule, metaclass=ABCMeta):
 
     def Log(self, message):
         Log.Entry(message)
+
+    def Error(self, message):
+        Log.Error(message, tag=self._name)
 
     @staticmethod
     def Call(instruction):
