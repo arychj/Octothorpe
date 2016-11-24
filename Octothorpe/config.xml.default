@@ -14,6 +14,14 @@
     </database>
     <services>
         <service name="Test" />
+        <service name="Messaging">
+            <sms>
+                <username>xxx</username>
+                <password>xxx</password>
+                <from>1234567890</from>
+                <address_sanitize><![CDATA[[^\d]]]></address_sanitize>
+            </sms>
+        </service
     </services>
     <shims>
         <shim name="SlackShim">
