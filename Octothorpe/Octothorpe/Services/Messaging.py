@@ -7,6 +7,8 @@ from Octothorpe.Service import Service
 class Messaging(Service):
 
     def Send(self, protocol, to, message, subject = None):
+        Log.Debug(f"Sending message to {protocol}/{to}")
+
         result = None
 
         protocol = protocol.lower()
@@ -23,6 +25,8 @@ class Messaging(Service):
 
         if(result == None):
             result = {"success": "Message sent"}
+        elif("error" in result):
+            Log.Error(result["error"])
 
         return result
 
@@ -42,8 +46,7 @@ class Messaging(Service):
         elif len(toaddress) == 11:
             address = '+%s' % (address)
         else:
-            self.Error(f"'{to}' is not a valid 10 or 11 digit number")
-            return
+            return {"error": f"'{to}' is not a valid 10 or 11 digit number"}
 
         sms = client.sms.messages.create(
             to = address,
@@ -55,4 +58,9 @@ class Messaging(Service):
         pass
 
     def _slack(self, to, message):
-        pass
+        from Octothorpe.Injectors.Slack.SlackInjector import SlackInjector
+
+        if(SlackInjector.IsValidAddress(to)):
+            SlackInjector.Send(to, message)
+        else:
+            return {"error": f"Invalid address '{to}'"}
