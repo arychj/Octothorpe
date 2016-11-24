@@ -16,10 +16,16 @@ class SlackShim(Shim):
 
                 self._command = command.attrib['name']
 
+                xParameters = self.GetMultiple(f"commands/command[@name='{self._command}']/parameters/parameter")
+
+                parameters = {}
+                for xParameter in xParameters:
+                    parameters[xParameter.attrib["name"]] = xParameter.text
+
                 instruction = SlackShim.CreateInstruction(
                     command.find("service").text,
                     command.find("method").text,
-                    match.groupdict()
+                    {**parameters, **match.groupdict()}
                 )
 
                 break
