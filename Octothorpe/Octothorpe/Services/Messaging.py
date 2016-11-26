@@ -1,4 +1,4 @@
-import re
+import re, requests
 from twilio.rest import TwilioRestClient
 
 from Octothorpe.Log import Log
@@ -31,7 +31,13 @@ class Messaging(Service):
         return result
 
     def _email(self, to, message, subject):
-        pass
+        request_url = f"{self.GetString('email/base_url')}/{self.GetString('email/api_version')}/{self.GetString('email/domain')}/messages"
+        request = requests.post(request_url, auth=("api", self.GetString("email/key")), data={
+            "from": self.GetString("email/from"),
+            "to": to,
+            "subject": subject,
+            "text": message
+        })
     
     def _sms(self, to, message):
         client = TwilioRestClient(

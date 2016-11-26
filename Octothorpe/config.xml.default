@@ -15,7 +15,14 @@
     <services>
         <service name="Test" />
         <service name="Messaging">
-            <sms>
+            <email provider="mailgun">
+                <base_url>https://api.mailgun.net</base_url>
+                <api_version>v3</api_version>
+                <domain>xxx</domain>
+                <key>xxx</key>
+                <from><![CDATA[Octothorpe <no-reply@example.com>]]></from>
+            </email
+            <sms provider="twilio">
                 <username>xxx</username>
                 <password>xxx</password>
                 <from>1234567890</from>
