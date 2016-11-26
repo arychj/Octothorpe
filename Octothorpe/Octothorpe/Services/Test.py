@@ -6,6 +6,8 @@ import time
 from Octothorpe.Injectors.Slack.SlackInjector import SlackInjector
 
 class Test(Service):
+    _random_sleep_count = 0
+
     @property
     def _emitted_event_types(self):
         return ["emission"]
@@ -35,6 +37,15 @@ class Test(Service):
 
     def MoreThanOneParamater(self, more, than, one, parameter):
         pass
+
+    def RandomSleep(self):
+        seq = Test._random_sleep_count
+        Test._random_sleep_count=Test._random_sleep_count+1
+
+        i = randint(0,5)
+        time.sleep(i)
+
+        return {"seq": seq, "seconds": i}
 
     def RaiseException(self):
         raise Exception("I take umbrance to your call!!!")

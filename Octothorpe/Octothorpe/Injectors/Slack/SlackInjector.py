@@ -16,14 +16,6 @@ class SlackInjector(Injector):
         SlackInjector.Client = SlackClient(self.Settings.GetString("api_key"))
         return SlackInjector.Client.rtm_connect()
 
-    def Handle(self, channel, user, message):
-        self.Debug(f"Received message from {SlackInjector._resolve_channel_id(channel, user)} ({channel}): {message[:25]}")
-
-        result = self.Inject(message)
-
-        if(result != None):
-            SlackInjector.Send(channel, result)
-
     def ParsePayload(self, payload):
         if payload and len(payload) > 0:
             for output in payload:
@@ -42,7 +34,7 @@ class SlackInjector(Injector):
             while self._running:
                 channel, user, message = self.ParsePayload(self.Client.rtm_read())
                 if message and channel:
-                    self.Handle(channel, user, message)
+                    self.Handle(self._message_handler, args=[channel, user, message])
 
                 time.sleep(read_interval)
         else:
@@ -50,6 +42,14 @@ class SlackInjector(Injector):
 
     def Stop(self):
         self._running = False
+
+    def _message_handler(self, channel, user, message):
+        self.Debug(f"Received message from {SlackInjector._resolve_channel_id(channel, user)} ({channel}): {message[:25]}")
+
+        result = self.Inject(message)
+
+        if(result != None):
+            SlackInjector.Send(channel, result)
 
     @classmethod
     def IsValidAddress(cls, address):

@@ -29,6 +29,10 @@ class Injector(DynamicModule, metaclass=ABCMeta):
         self._name = name
         self._shim = shim
 
+    def Handle(self, handler, args=None, kwargs=None):
+        t = threading.Thread(target=handler, args=args, kwargs=kwargs)
+        t.start()
+
     def Inject(self, message):
         result = None
 
