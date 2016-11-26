@@ -9,7 +9,7 @@ class CommandLineInjector(Injector):
         while(self._running):
             try:
                 line = input()
-                if(line in self.GetString("stop_signals").split(",")):
+                if(line in self.Settings.GetString("stop_signals").split(",")):
                     self.Log("Stop signal received")
                     Manager.Stop()
                     break

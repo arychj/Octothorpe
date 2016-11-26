@@ -31,9 +31,9 @@ class Messaging(Service):
         return result
 
     def _email(self, to, message, subject):
-        request_url = f"{self.GetString('email/base_url')}/{self.GetString('email/api_version')}/{self.GetString('email/domain')}/messages"
-        request = requests.post(request_url, auth=("api", self.GetString("email/key")), data={
-            "from": self.GetString("email/from"),
+        request_url = f"{self.Settings.GetString('email/base_url')}/{self.Settings.GetString('email/api_version')}/{self.Settings.GetString('email/domain')}/messages"
+        request = requests.post(request_url, auth=("api", self.Settings.GetString("email/key")), data={
+            "from": self.Settings.GetString("email/from"),
             "to": to,
             "subject": subject,
             "text": message
@@ -41,11 +41,11 @@ class Messaging(Service):
     
     def _sms(self, to, message):
         client = TwilioRestClient(
-            self.GetString("sms/username"),
-            self.GetString("sms/password")
+            self.Settings.GetString("sms/username"),
+            self.Settings.GetString("sms/password")
         )
 
-        address = re.sub(self.GetString("sms/address_sanitize"), "", to)
+        address = re.sub(self.Settings.GetString("sms/address_sanitize"), "", to)
 
         if len(address) == 10:
             address = '+1%s' % (address)
@@ -56,7 +56,7 @@ class Messaging(Service):
 
         sms = client.sms.messages.create(
             to = address,
-            from_ = self.GetString("sms/from"),
+            from_ = self.Settings.GetString("sms/from"),
             body = message
         )
     

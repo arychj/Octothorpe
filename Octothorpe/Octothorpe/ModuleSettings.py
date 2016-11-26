@@ -9,6 +9,18 @@ class ModuleSettings(metaclass=ABCMeta):
     def _base_key(self):
         pass
 
+    @property
+    def Settings(self):
+        if("_settings" not in locals()):
+            self._settings = _module_settings(self._base_key)
+        
+        return self._settings
+
+class _module_settings():
+
+    def __init__(self, base_key):
+        self._base_key = base_key
+
     def GetInt(self, key):
         val = self._raw(key)[0].text
 

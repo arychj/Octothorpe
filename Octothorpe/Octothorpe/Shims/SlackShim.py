@@ -8,7 +8,7 @@ class SlackShim(Shim):
         instruction = None
 
         match = None
-        commands = self.GetMultiple("commands/command")
+        commands = self.Settings.GetMultiple("commands/command")
         for command in commands:
             match = re.match(command.find("pattern").text, message, re.IGNORECASE)
             if(match != None):
@@ -16,7 +16,7 @@ class SlackShim(Shim):
 
                 self._command = command.attrib['name']
 
-                xParameters = self.GetMultiple(f"commands/command[@name='{self._command}']/parameters/parameter")
+                xParameters = self.Settings.GetMultiple(f"commands/command[@name='{self._command}']/parameters/parameter")
 
                 parameters = {}
                 for xParameter in xParameters:
@@ -33,7 +33,7 @@ class SlackShim(Shim):
         return instruction
 
     def Outbound(self, instruction):
-        template = self.GetString(f"commands/command[@name='{self._command}']/response_template")
+        template = self.Settings.GetString(f"commands/command[@name='{self._command}']/response_template")
         result = template.format(instruction.Result)
 
         return result

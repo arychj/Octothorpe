@@ -13,7 +13,7 @@ class SlackInjector(Injector):
         return SlackInjector._client
 
     def Connect(self):
-        SlackInjector.Client = SlackClient(self.GetString("api_key"))
+        SlackInjector.Client = SlackClient(self.Settings.GetString("api_key"))
         return SlackInjector.Client.rtm_connect()
 
     def Handle(self, channel, user, message):
@@ -33,7 +33,7 @@ class SlackInjector(Injector):
         return None, None, None
 
     def Start(self):
-        read_interval = self.GetInt("read_interval")
+        read_interval = self.Settings.GetInt("read_interval")
         self._running = True
 
         if self.Connect():
