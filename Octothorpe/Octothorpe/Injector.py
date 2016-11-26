@@ -1,4 +1,4 @@
-import threading, time
+import threading
 
 from abc import ABCMeta, abstractmethod
 from importlib import import_module
@@ -38,8 +38,7 @@ class Injector(DynamicModule, metaclass=ABCMeta):
         if(instruction):
             InstructionQueue.Enqueue(instruction)
 
-            while(instruction.IsComplete == False):
-                time.sleep(0.1)
+            instruction.WaitUntilComplete()
             
             result = shim.Outbound(instruction)
         

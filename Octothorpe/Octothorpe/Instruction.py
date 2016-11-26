@@ -1,4 +1,4 @@
-import json, re, sys, time, uuid
+import json, re, sys, time, threading, uuid
 
 from .Config import Config
 from .Database.Statement import Statement
@@ -17,6 +17,10 @@ class Instruction(object):
         self.GivenOn = given_on
         self.ProcessingOn = processing_on
         self.CompletedOn = completed_on
+
+        self._lock = threading.Lock()
+        if(self.CompletedOn == None):
+            self._lock.acquire()
 
         if(self.Id == None):
             self.CreateRecord()
@@ -96,8 +100,15 @@ class Instruction(object):
                 "processing_on": Statement.FormatDatetime(self.ProcessingOn),
                 "completed_on": Statement.FormatDatetime(self.CompletedOn)
             })
+
+            self._lock.release()
         else:
             raise Exception("Cannot complete unsaved instruction.")
+
+    def WaitUntilComplete(self):
+        if(self._lock.locked()):
+            self._lock.acquire()
+            self._lock.release()
 
     def Fail(self):
         self.Complete()
