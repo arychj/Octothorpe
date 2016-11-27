@@ -21,7 +21,7 @@ class Worker(Thread):
             try:
                 Log.Debug(f"Started processing instruction {instruction.Id}...", tag=self._name)
 
-                Service.Call(instruction)
+                Service.Process(instruction)
                 instruction.Complete()
 
                 Log.Debug(f"Finished processing instruction {instruction.Id} in {instruction.ProcessingTime:.2f} seconds (waited {instruction.WaitingTime:.2f})", tag=self._name)
@@ -33,4 +33,4 @@ class Worker(Thread):
 
             instruction = self._queue.Dequeue()
 
-        Log.Debug("Stopping", tag=self.name)
+        Log.Debug("Stopping", tag=self._name)

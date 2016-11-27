@@ -67,7 +67,7 @@ class Service(DynamicModule, metaclass=ABCMeta):
         Log.Error(message, tag=self._name)
 
     @staticmethod
-    def Call(instruction):
+    def Process(instruction):
         instruction.Processing()
 
         service_type = Service._get_module("service", instruction.Service)
