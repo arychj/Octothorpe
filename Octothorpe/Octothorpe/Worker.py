@@ -2,10 +2,9 @@ from threading import Thread
 
 from .Config import Config
 from .Log import Log
-from .Service import Service
+from .Task import TaskType
 
 class Worker(Thread):
-    _queue = None
     _name = None
 
     def __init__(self, queue, name):
@@ -16,21 +15,22 @@ class Worker(Thread):
         self.start()
 
     def run(self):
-        instruction = self._queue.Dequeue()
-        while(instruction.Id != -1):
+        task = self._queue.Dequeue()
+        while(task.TaskType != TaskType.Stop):
             try:
-                Log.Debug(f"Started processing instruction {instruction.Id}...", tag=self._name)
+                Log.Debug(f"Started processing task {task.Identity}...", tag=self._name)
 
-                Service.Process(instruction)
-                instruction.Complete()
+                task.Processing()
+                task.Process()
+                task.Complete()
 
-                Log.Debug(f"Finished processing instruction {instruction.Id} in {instruction.ProcessingTime:.2f} seconds (waited {instruction.WaitingTime:.2f})", tag=self._name)
+                Log.Debug(f"Finished processing task {task.Identity} in {task.ProcessingTime:.3f} seconds (waited {task.WaitingTime:.3f})", tag=self._name)
             except Exception as e:
-                instruction.Fail()
+                task.Fail()
                 Log.Exception(e)
             finally:
                 self._queue.Complete()
 
-            instruction = self._queue.Dequeue()
+            task = self._queue.Dequeue()
 
-        Log.Debug("Stopping", tag=self._name)
+        Log.Debug("Stopping", tag=self.name)

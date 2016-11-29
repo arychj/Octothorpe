@@ -6,7 +6,7 @@ from importlib import import_module
 from .Config import Config
 from .DynamicModule import DynamicModule
 from .Instruction import Instruction
-from .InstructionQueue import InstructionQueue
+from .TaskQueue import TaskQueue
 from .Log import Log
 from .Shim import Shim
 
@@ -40,7 +40,7 @@ class Injector(DynamicModule, metaclass=ABCMeta):
         instruction = shim.Inbound(message)
 
         if(instruction):
-            InstructionQueue.Enqueue(instruction)
+            TaskQueue.Enqueue(instruction)
 
             instruction.WaitUntilComplete()
             

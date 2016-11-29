@@ -13,11 +13,11 @@ class Test(Service):
         return ["emission"]
 
     def Print(self, words):
-        self.Log(f"{self._instruction.ShortTag} > Print: {words}")
+        self.Log(f"{self._instruction.Tag} > Print: {words}")
 
     def Echo(self, **kwargs):
         s = ", ".join(["%s=%s" % (k, v) for (k, v) in kwargs.items()])
-        self.Log(f"{self._instruction.ShortTag} > Echo: {s}")
+        self.Log(f"{self._instruction.Tag} > Echo: {s}")
 
         return kwargs
 
@@ -25,7 +25,7 @@ class Test(Service):
         i = randint(0,5)
 #        time.sleep(i)
 
-        self.Log(f"{self._instruction.ShortTag} > Test: {text} [slept for {i}]")
+        self.Log(f"{self._instruction.Tag} > Test: {text} [slept for {i}]")
 
         self.Emit("emission", {
         	"text": f">>> emitted instruction payload({text})"

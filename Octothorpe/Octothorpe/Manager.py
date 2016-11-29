@@ -1,29 +1,28 @@
 import sys, threading
 
 from .Injector import Injector
-from .InstructionQueue import InstructionQueue
+from .TaskQueue import TaskQueue
 from .Log import Log
 from .Service import Service
+from .Event import Event
 
 class Manager:
 
     @staticmethod
     def Start():
-        Service._queue = InstructionQueue
-
-        InstructionQueue.Start()
+        TaskQueue.Start()
         Injector.StartAll()
 
     @staticmethod
     def Stop():
         Log.System("Stopping system")
 
-        InstructionQueue.Stop()
+        TaskQueue.Stop()
         Injector.StopAll()
 
     @staticmethod
     def Queue(instruction):
-        InstructionQueue.Enqueue(instruction)
+        TaskQueue.Enqueue(instruction)
 
     @staticmethod
     def Process(instruction):

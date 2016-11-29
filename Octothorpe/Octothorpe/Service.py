@@ -6,13 +6,10 @@ from importlib import import_module
 from .Config import Config
 from .DynamicModule import DynamicModule
 from .Event import Event
-from .Instruction import Instruction
 from .Log import Log
-from .Rule import Rule
+from .TaskQueue import TaskQueue
 
 class Service(DynamicModule, metaclass=ABCMeta):
-    _queue = None
-
     @property
     def _module_type(self):
         return "service"
@@ -47,16 +44,7 @@ class Service(DynamicModule, metaclass=ABCMeta):
                 payload
             )
 
-            rules = Rule.GetMatches(event)
-            for rule in rules:
-                instruction = Instruction.Create(
-                    self._instruction.Level + 1, 
-                    rule.ConsumingService, 
-                    rule.ConsumingMethod, 
-                    rule.PreparePayload(event)
-                )
-
-                Service._queue.Enqueue(instruction)
+            TaskQueue.Enqueue(event)
         else:
             Log.Error(f"Unknown event type '{event_type}' emitted by service {self._instruction.Service}.{self._instruction.Method}()")
 
@@ -67,9 +55,7 @@ class Service(DynamicModule, metaclass=ABCMeta):
         Log.Error(message, tag=self._name)
 
     @staticmethod
-    def Process(instruction):
-        instruction.Processing()
-
+    def Call(instruction):
         service_type = Service._get_module("service", instruction.Service)
 
         service = service_type()

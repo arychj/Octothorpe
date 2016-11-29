@@ -2,10 +2,34 @@ import json, time
 
 from .Database.Statement import Statement
 from .Log import Log
+from .Rule import Rule
+from .Task import Task, TaskType
+from .TaskQueue import TaskQueue
 
-class Event:
+#python circular dependency nonsense
+import Octothorpe.Instruction
 
-    def __init__(self, id, instruction, service, type, payload, emitted_on):
+class Event(Task):
+
+    @property
+    def TaskType(self):
+        return TaskType.Event
+
+    @property
+    def Priority(self):
+        priority = 0
+        priority += 50
+        priority += -1 * (int(time.time()) - int(self.GivenOn))
+
+        return priority
+
+    def __init__(self, id, instruction, service, type, payload, emitted_on, processing_on = None, completed_on = None):
+        super().__init__(
+            given_on = emitted_on,
+            processing_on = processing_on,
+            completed_on = completed_on
+        )
+
         self.Id = id
         self.Instruction = instruction
         self.Service = service
@@ -15,6 +39,18 @@ class Event:
 
         if(self.Id == None):
             self.CreateRecord()
+
+    def Process(self):
+        rules = Rule.GetMatches(self)
+        for rule in rules:
+            instruction = Octothorpe.Instruction.Instruction.Create( #python circular dependency nonsense
+                self.Instruction.Level + 1, 
+                rule.ConsumingService, 
+                rule.ConsumingMethod, 
+                rule.PreparePayload(self)
+            )
+
+            TaskQueue.Enqueue(instruction)
 
     def CreateRecord(self):
         statement = Statement.Get("Events/Create")
@@ -27,6 +63,9 @@ class Event:
         })
 
         self.Id = result.LastId
+
+    def Save(self):
+        pass
 
     @staticmethod
     def Create(instruction, service, type, payload):
@@ -42,4 +81,3 @@ class Event:
         Log.Debug(f"Created event {event.Service}/{event.Type}:{event.Id}")
 
         return event
-
