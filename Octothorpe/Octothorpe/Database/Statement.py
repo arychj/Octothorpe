@@ -1,4 +1,4 @@
-import datetime, sqlite3, threading
+import datetime, sqlite3, threading, time
 
 from .Result import Result
 from ..Config import Config
@@ -17,6 +17,8 @@ class Statement:
             cls._connection = sqlite3.connect(Config.GetString("database/path"), check_same_thread=False)
             cls._connection.row_factory = sqlite3.Row
             cls._cursor = cls._connection.cursor()
+
+            threading.Thread(target=cls._commit_changes,daemon=True).start()
 
         return cls._cursor
 
@@ -40,8 +42,6 @@ class Statement:
                 rows,
                 self._shared_cursor().lastrowid
             )
-
-            self._shared_cursor().connection.commit()
         except Exception as e:
             Log.Exception(e)
         finally:
@@ -68,9 +68,19 @@ class Statement:
         cls._shared_cursor().commit()
         cls._shared_cursor().connection._close()
 
+    @classmethod
+    def _commit_changes(cls):
+        while(1):
+            cls._lock.acquire()
+            try:
+                cls._shared_cursor().connection.commit()
+            finally:
+                cls._lock.release()
+
+            time.sleep(1)
+
     @staticmethod
     def FormatDatetime(d):
         return datetime.datetime.fromtimestamp(d).strftime(
             Config.GetString("logging/time_format")
         )
-
