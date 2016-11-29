@@ -39,7 +39,7 @@ class TaskQueue:
             if(cls._queue.qsize() < 50):
                 cls._queue.put(task)
             else:
-                pass
+                cls._queue.put(task)
 
     @classmethod
     def Dequeue(cls):
