@@ -4,7 +4,6 @@ import json, time
 from socketserver import ThreadingMixIn
 
 from ..Injector import Injector
-from ..Instruction import Instruction
 
 class HttpInjector(Injector):
     def Start(self):
