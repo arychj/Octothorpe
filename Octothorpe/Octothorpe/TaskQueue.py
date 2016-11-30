@@ -3,7 +3,7 @@ import threading, time, queue
 from .Config import Config
 from .Log import Log
 from .Task import Task, TaskType, StopTask
-from .Worker import Worker
+from .TaskWorker import TaskWorker
 
 class TaskQueue:
     _poll = True
@@ -12,7 +12,7 @@ class TaskQueue:
     @classmethod
     def Start(cls):
         for name in range(Config.GetInt("processing/worker_threads")):
-            Worker(cls, str(name))
+            TaskWorker(cls, str(name))
 
         cls._start_polling()
 

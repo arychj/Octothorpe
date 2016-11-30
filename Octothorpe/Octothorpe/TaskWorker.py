@@ -4,7 +4,7 @@ from .Config import Config
 from .Log import Log
 from .Task import TaskType
 
-class Worker(Thread):
+class TaskWorker(Thread):
     _name = None
 
     def __init__(self, queue, name):
