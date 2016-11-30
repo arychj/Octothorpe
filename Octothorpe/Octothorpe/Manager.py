@@ -1,4 +1,4 @@
-import argparse, sys, threading
+import argparse
 from random import randint
 
 from .Config import Config
@@ -30,7 +30,7 @@ class Manager:
                 instruction = Instruction.Create(
                     1,
                     "Test", 
-                    ("Echo" if randint(0,1) == 0 else "Test"), 
+                    ("Echo" if randint(0, 1) == 0 else "Test"), 
                     payload
                 )
 
