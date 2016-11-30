@@ -29,6 +29,12 @@
                 <address_sanitize><![CDATA[[^\d]]]></address_sanitize>
             </sms>
         </service
+        <service name="Spotify">
+            <port>4370</port>
+            <origin_header><![CDATA[https://open.spotify.com]]></origin_header>
+            <oauth_provider><![CDATA[http://open.spotify.com/token]]></oauth_provider>
+            <api_base_endpoint><![CDATA[https://api.spotify.com/v1]]></api_base_endpoint>
+        </service>
     </services>
     <shims>
         <shim name="SlackShim">
