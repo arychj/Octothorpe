@@ -1,0 +1,1 @@
+CREATE INDEX tblRules_PS_ET_CS_CM on tblRules (ProducingService, EventType)

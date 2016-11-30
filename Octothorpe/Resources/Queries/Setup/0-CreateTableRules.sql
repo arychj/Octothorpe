@@ -8,4 +8,3 @@ CREATE TABLE tblRules(
     IsActive            BOOLEAN
 )
 
-CREATE INDEX tblRules_PS-ET-CS-CM on tblRules (ProducingService, EventType)

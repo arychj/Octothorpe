@@ -5,6 +5,7 @@ from .Log import Log
 from .Rule import Rule
 from .Task import Task, TaskType
 from .TaskQueue import TaskQueue
+from .Tools import Tools
 
 #python circular dependency nonsense
 import Octothorpe.Instruction
@@ -59,7 +60,7 @@ class Event(Task):
             "service": self.Service,
             "type": self.Type,
             "payload": json.dumps(self.Payload),
-            "emitted_on": Statement.FormatDatetime(self.EmittedOn)
+            "emitted_on": Tools.FormatDatetime(self.EmittedOn)
         })
 
         self.Id = result.LastId

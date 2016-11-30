@@ -5,6 +5,7 @@ from .Database.Statement import Statement
 from .Log import Log
 from .Service import Service
 from .Task import Task, TaskType
+from .Tools import Tools
 
 class Instruction(Task):
     
@@ -64,7 +65,7 @@ class Instruction(Task):
             "service": self.Service,
             "method": self.Method,
             "payload": json.dumps(self.Payload),
-            "given_on": Statement.FormatDatetime(self.GivenOn)
+            "given_on": Tools.FormatDatetime(self.GivenOn)
         })
 
         self.Id = result.LastId
@@ -81,8 +82,8 @@ class Instruction(Task):
             statement = Statement.Get("Instructions/Complete")
             statement.Execute({
                 "id": self.Id,
-                "processing_on": Statement.FormatDatetime(self.ProcessingOn),
-                "completed_on": Statement.FormatDatetime(self.CompletedOn)
+                "processing_on": Tools.FormatDatetime(self.ProcessingOn),
+                "completed_on": Tools.FormatDatetime(self.CompletedOn)
             })
         else:
             raise Exception("Cannot complete unsaved instruction.")

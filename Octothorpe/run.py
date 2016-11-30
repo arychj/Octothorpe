@@ -2,9 +2,8 @@
 import argparse, sys
 
 from Octothorpe.Config import Config
-from Octothorpe.Database.Database import Database
+from Octothorpe.Setup import Setup
 from Octothorpe.Instruction import Instruction
-from Octothorpe.Log import Log
 from Octothorpe.Manager import Manager
 
 from random import randint
@@ -18,7 +17,7 @@ args = parser.parse_args()
 Config.SetConfigFile(args.config)
 
 if(args.setup):
-    Database.Setup()
+    Setup.Setup()
 
 if(args.test != None):
     for i in range(args.test):
