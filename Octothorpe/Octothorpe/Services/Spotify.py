@@ -60,7 +60,7 @@ class Spotify(Service):
             "pause": "true" if pause else "false"
         })
 
-        return {"state": "Paused" if pause else "Playing"}
+        return {"state": "paused" if pause else "playing"}
 
     def Unpause(self):
         return self.Pause(False)
