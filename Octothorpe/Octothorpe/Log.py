@@ -11,7 +11,7 @@ class Log:
     @classmethod
     def Entry(cls, message, tag=""):
         #temporary
-        cls._console_write("entry", message, tag)
+        cls._console_write("entry", message, tag=tag)
         return None
     
     @classmethod

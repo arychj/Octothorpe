@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from enum import Enum
-import time, uuid
+import time, threading, uuid
 
 class Task(metaclass=ABCMeta):
 
@@ -57,6 +57,10 @@ class Task(metaclass=ABCMeta):
 
         self._ident = ident
 
+        self._lock = threading.Lock()
+        if(self.CompletedOn == None):
+            self._lock.acquire()
+
     def __lt__(self, other):
         if(self.TaskType == TaskType.Stop):
             return True
@@ -70,6 +74,11 @@ class Task(metaclass=ABCMeta):
                 return self.GivenOn < other.GivenOn
             else:
                 return  sp < op
+
+    def WaitUntilComplete(self):
+        if(self._lock.locked()):
+            self._lock.acquire()
+            self._lock.release()
     
     @abstractmethod
     def Process(self):
@@ -85,6 +94,8 @@ class Task(metaclass=ABCMeta):
     def Complete(self):
         self.CompletedOn = time.time()
         self.Save()
+
+        self._lock.release()
 
     def Fail(self):
         self.Complete()

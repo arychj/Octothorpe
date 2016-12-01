@@ -3,7 +3,7 @@ import datetime, croniter
 from ..Injector import Injector
 from ..Log import Log
 
-class ScheduleInjector(Injector):
+class Schedule(Injector):
     def Start(self):
         now = datetime.datetime.now()
         sched = '1 15 1,15 * *'

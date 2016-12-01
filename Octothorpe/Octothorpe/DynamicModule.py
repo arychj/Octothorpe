@@ -7,8 +7,9 @@ from importlib import import_module
 from .Config import Config
 from .Log import Log
 from .ModuleSettings import ModuleSettings
+from .NamedInstance import NamedInstance
 
-class DynamicModule(ModuleSettings, metaclass=ABCMeta):
+class DynamicModule(NamedInstance, ModuleSettings, metaclass=ABCMeta):
     
     @property
     @abstractmethod
@@ -17,10 +18,10 @@ class DynamicModule(ModuleSettings, metaclass=ABCMeta):
 
     @property
     def _base_key(self):
-        return f"{self._module_type}s/{self._module_type}[@name='{self._name}']"
+        return f"{self._module_type}s/{self._module_type}[@name='{self.Name}']"
 
     def Debug(self, message):
-        Log.Debug(message, tag=self._name)
+        Log.Debug(message, tag=self.Name)
 
     @staticmethod
     @lru_cache(maxsize=64)

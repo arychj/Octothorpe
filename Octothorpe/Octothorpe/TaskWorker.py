@@ -5,7 +5,6 @@ from .Log import Log
 from .Task import TaskType
 
 class TaskWorker(Thread):
-    _name = None
 
     def __init__(self, queue, name):
         Thread.__init__(self)

@@ -4,8 +4,9 @@ import json, time
 from socketserver import ThreadingMixIn
 
 from ..Injector import Injector
+from ..Service import Service
 
-class HttpInjector(Injector):
+class HttpServer(Service, Injector):
     def Start(self):
         self._httpd = self._threading_server(("0.0.0.0", 1664), self._server_request_handler)
         self._httpd.serve_forever()

@@ -1,8 +1,8 @@
 from ..Injector import Injector
-from ..Instruction import Instruction
 from ..Manager import Manager
+from ..Service import Service
 
-class CommandLineInjector(Injector):
+class CommandLine(Service, Injector):
     def Start(self):
         self._running = True
 
@@ -10,7 +10,7 @@ class CommandLineInjector(Injector):
             try:
                 line = input()
                 if(line in self.Settings.GetString("stop_signals").split(",")):
-                    self.Log("Stop signal received")
+                    self.System("Stop signal received")
                     Manager.Stop()
                     break
                 else:

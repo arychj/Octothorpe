@@ -3,7 +3,7 @@ from Octothorpe.Service import Service
 from random import randint
 import time
 
-from Octothorpe.Injectors.Slack.SlackInjector import SlackInjector
+from Octothorpe.Services.Slack.Slack import Slack
 
 class Test(Service):
     _random_sleep_count = 0
@@ -51,7 +51,7 @@ class Test(Service):
         raise Exception("I take umbrance to your call!!!")
 
     def Slack(self, to, message):
-        if(SlackInjector.IsValidAddress(to)):
-            SlackInjector.Send(to, message)
+        if(Slack.IsValidAddress(to)):
+            Slack.Send(to, message)
         else:
             Log.Error(f"Invalid address '{to}'")

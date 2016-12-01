@@ -7,6 +7,10 @@ from .Log import Log
 class Shim(DynamicModule):
 
     @property
+    def Name(self):
+        return self._name
+
+    @property
     def _module_type(self):
         return "shim"
 

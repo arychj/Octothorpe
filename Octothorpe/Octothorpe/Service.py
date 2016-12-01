@@ -10,12 +10,13 @@ from .Log import Log
 from .TaskQueue import TaskQueue
 
 class Service(DynamicModule, metaclass=ABCMeta):
+
     @property
     def _module_type(self):
         return "service"
     
     @property
-    def _name(self):
+    def Name(self):
         return self.__class__.__name__
 
     @property
@@ -49,10 +50,13 @@ class Service(DynamicModule, metaclass=ABCMeta):
             Log.Error(f"Unknown event type '{event_type}' emitted by service {self._instruction.Service}.{self._instruction.Method}()")
 
     def Log(self, message):
-        Log.Entry(message)
+        Log.Entry(message, self.Name)
+
+    def System(self, message):
+        Log.System(message, tag=self.Name)
 
     def Error(self, message):
-        Log.Error(message, tag=self._name)
+        Log.Error(message, tag=self.Name)
 
     @staticmethod
     def Call(instruction):

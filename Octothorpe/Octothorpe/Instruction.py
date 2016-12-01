@@ -1,4 +1,4 @@
-import json, re, sys, time, threading
+import json, re, sys, time 
 
 from .Config import Config
 from .Database.Statement import Statement
@@ -50,10 +50,6 @@ class Instruction(Task):
         self.Payload = Instruction._parse_payload(payload)
         self.Result = None
 
-        self._lock = threading.Lock()
-        if(self.CompletedOn == None):
-            self._lock.acquire()
-
         if(self.Id == None):
             self.CreateRecord()
 
@@ -73,10 +69,6 @@ class Instruction(Task):
     def Process(self):
         Service.Call(self)
 
-    def Complete(self):
-        super().Complete()
-        self._lock.release()
-
     def Save(self):
         if(self.Id != None):
             statement = Statement.Get("Instructions/Complete")
@@ -87,11 +79,6 @@ class Instruction(Task):
             })
         else:
             raise Exception("Cannot complete unsaved instruction.")
-
-    def WaitUntilComplete(self):
-        if(self._lock.locked()):
-            self._lock.acquire()
-            self._lock.release()
 
     @staticmethod
     def Create(level, service, method, payload):

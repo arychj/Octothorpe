@@ -3,18 +3,19 @@ from functools import lru_cache
 from .slackclient import SlackClient
 
 from ...Injector import Injector
+from ...Service import Service
 
-class SlackInjector(Injector):
+class Slack(Service, Injector):
     _client = None
 
     @property
     @staticmethod
     def Client():
-        return SlackInjector._client
+        return Slack._client
 
     def Connect(self):
-        SlackInjector.Client = SlackClient(self.Settings.GetString("api_key"))
-        return SlackInjector.Client.rtm_connect()
+        Slack.Client = SlackClient(self.Settings.GetString("api_key"))
+        return Slack.Client.rtm_connect()
 
     def ParsePayload(self, payload):
         if payload and len(payload) > 0:
@@ -29,7 +30,7 @@ class SlackInjector(Injector):
         self._running = True
 
         if self.Connect():
-            self.Log("Connection established")
+            self.System("Connection established")
 
             while self._running:
                 channel, user, message = self.ParsePayload(self.Client.rtm_read())
@@ -44,12 +45,12 @@ class SlackInjector(Injector):
         self._running = False
 
     def _message_handler(self, channel, user, message):
-        self.Debug(f"Received message from {SlackInjector._resolve_channel_id(channel, user)} ({channel}): {message[:25]}")
+        self.Debug(f"Received message from {Slack._resolve_channel_id(channel, user)} ({channel}): {message[:25]}")
 
         result = self.Inject(message)
 
         if(result != None):
-            SlackInjector.Send(channel, result)
+            Slack.Send(channel, result)
 
     @classmethod
     def IsValidAddress(cls, address):

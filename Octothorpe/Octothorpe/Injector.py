@@ -1,22 +1,17 @@
 import threading
 
 from abc import ABCMeta, abstractmethod
-from importlib import import_module
 
 from .Config import Config
 from .DynamicModule import DynamicModule
 from .Instruction import Instruction
-from .TaskQueue import TaskQueue
 from .Log import Log
+from .TaskQueue import TaskQueue
 from .Shim import Shim
 
 class Injector(DynamicModule, metaclass=ABCMeta):
     _active_injectors = []
    
-    @property
-    def _module_type(self):
-        return "injector"
-
     @abstractmethod
     def Start(self):
         pass
@@ -25,8 +20,7 @@ class Injector(DynamicModule, metaclass=ABCMeta):
     def Stop(self):
         pass
 
-    def __init__(self, name, shim):
-        self._name = name
+    def __init__(self, shim):
         self._shim = shim
 
     def Handle(self, handler, args=None, kwargs=None):
@@ -48,21 +42,14 @@ class Injector(DynamicModule, metaclass=ABCMeta):
         
         return result
 
-    def Log(self, message):
-        Log.System(message, tag=self._name)
-            
-    def Error(self, message):
-        Log.Error(message, tag=self._name)
-    
     @staticmethod
     def StartAll():
-        xInjectors = Config._raw(f"injectors/injector")
+        xInjectors = Config._raw(f"services/service[@injectable='true']")
 
         for xInjector in xInjectors:
-            injector_type = Injector._get_module("injector", xInjector.attrib["name"])
+            injector_type = Injector._get_module("service", xInjector.attrib["name"])
             
             injector = injector_type(
-                xInjector.attrib['name'],
                 (xInjector.attrib['shim'] if "shim" in xInjector.attrib else None)
             )
 
@@ -72,7 +59,7 @@ class Injector(DynamicModule, metaclass=ABCMeta):
 
             Injector._active_injectors.append(injector)
 
-            Log.System(f"Injector '{injector._name}' started")
+            Log.System(f"Injector '{injector.Name}' started")
 
     @staticmethod
     def StopAll():
