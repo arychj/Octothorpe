@@ -1,4 +1,4 @@
-import json
+import json, string
 
 from .Config import Config
 from .Database.Statement import Statement
@@ -36,10 +36,10 @@ class Rule:
 
     def PreparePayload(self, event):
         if(self.PayloadTransform != None):
-            sPayload = self.PayloadTransform.format(**{**event.Payload, **self.Extras})
+            sPayload = PayloadFormatter().format(self.PayloadTransform, **{**event.Payload, **self.Extras})
             return json.loads(sPayload)
         else:
-            return event.Payload
+            return {}
 
     def Deactivate(self):
         statement = Statement.Get("Rules/Deactivate")
@@ -143,3 +143,24 @@ class Rule:
             payload_transform
         )
 
+class PayloadFormatter(string.Formatter):
+    def __init__(self, missing='', bad_fmt='!!'):
+        self.missing, self.bad_fmt=missing, bad_fmt
+
+    def get_field(self, field_name, args, kwargs):
+        # Handle a key not found
+        try:
+            val=super(PayloadFormatter, self).get_field(field_name, args, kwargs)
+            # Python 3, 'super().get_field(field_name, args, kwargs)' works
+        except (KeyError, AttributeError):
+            val=None,field_name 
+        return val 
+
+    def format_field(self, value, spec):
+        # handle an invalid format
+        if value==None: return self.missing
+        try:
+            return super(PayloadFormatter, self).format_field(value, spec)
+        except ValueError:
+            if self.bad_fmt is not None: return self.bad_fmt   
+            else: raise

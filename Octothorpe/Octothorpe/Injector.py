@@ -27,19 +27,21 @@ class Injector(DynamicModule, metaclass=ABCMeta):
         t = threading.Thread(target=handler, args=args, kwargs=kwargs)
         t.start()
 
-    def Inject(self, message):
+    def EmitX(self, message):
         result = None
 
-        shim = Shim.Get(self._shim)
-        instruction = shim.Inbound(message)
+        shim = Shim.Get(self, self._shim)
+        event = shim.Inbound(message)
 
-        if(instruction):
-            TaskQueue.Enqueue(instruction)
+        if(event):
+            TaskQueue.Enqueue(event)
 
-            instruction.WaitUntilComplete()
-            
-            result = shim.Outbound(instruction)
-        
+            event.WaitUntilComplete()
+
+            if(event.CaptureInstruction != None):
+                event.CaptureInstruction.WaitUntilComplete()
+                result = shim.Outbound(event.CaptureInstruction)
+
         return result
 
     @staticmethod

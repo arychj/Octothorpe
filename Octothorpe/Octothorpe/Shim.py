@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 from .DynamicModule import DynamicModule
-from .Instruction import Instruction
+from .Event import Event
 from .Log import Log
 
 class Shim(DynamicModule):
@@ -14,7 +14,8 @@ class Shim(DynamicModule):
     def _module_type(self):
         return "shim"
 
-    def __init__(self, name):
+    def __init__(self, service, name):
+        self._service = service
         self._name = name
 
     def Inbound(self, message):
@@ -23,20 +24,22 @@ class Shim(DynamicModule):
     def Outbound(self, instruction):
         return str(instruction.Result)
 
-    @classmethod
-    def CreateInstruction(cls, service, method, payload):
-        return Instruction.Create(
-            1,
-            service,
-            method,
-            payload
-        )
+    def CreateEvent(self, event_type, payload):
+        if(event_type in self._service._emitted_event_types):
+            return Event.Create(
+                None,
+                self._service.Name,
+                event_type,
+                payload
+            )
+        else:
+            Log.Error(f"Unknown event type '{event_type}' emitted by shim {self.Name}")
 
     @staticmethod
-    def Get(name):
+    def Get(service, name):
         if(name != None):
             shim_type = Shim._get_module("shim", name)
-            shim = shim_type(name)
+            shim = shim_type(service, name)
         else:
             shim = Shim(name)
 

@@ -38,25 +38,36 @@ class Event(Task):
         self.Payload = payload
         self.EmittedOn = emitted_on
 
+        self.CaptureService = None
+        self.CaptureMethod = None
+        self.CaptureInstruction = None
+
         if(self.Id == None):
             self.CreateRecord()
+
+    def Capture(self, service, method):
+        self.CaptureService = service
+        self.CaptureMethod = metho
 
     def Process(self):
         rules = Rule.GetMatches(self)
         for rule in rules:
             instruction = Octothorpe.Instruction.Instruction.Create( #python circular dependency nonsense
-                self.Instruction.Level + 1, 
+                (1 if self.Instruction == None else self.Instruction.Level + 1), 
                 rule.ConsumingService, 
                 rule.ConsumingMethod, 
                 rule.PreparePayload(self)
             )
 
+            if(self.CaptureService == instruction.Service and self.CaptureMethod == instruction.Method):
+                self.CaptureInstruction = instructio
+                
             TaskQueue.Enqueue(instruction)
 
     def CreateRecord(self):
         statement = Statement.Get("Events/Create")
         result = statement.Execute({
-            "id_instruction": self.Instruction.Id,
+            "id_instruction": (self.Instruction.Id if self.Instruction != None else None),
             "service": self.Service,
             "type": self.Type,
             "payload": json.dumps(self.Payload),

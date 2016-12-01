@@ -12,6 +12,10 @@ class Slack(Service, Injector):
     @staticmethod
     def Client():
         return Slack._client
+    
+    @property
+    def _emitted_event_types(self):
+        return ["message_received"]
 
     def Connect(self):
         Slack.Client = SlackClient(self.Settings.GetString("api_key"))
@@ -47,7 +51,7 @@ class Slack(Service, Injector):
     def _message_handler(self, channel, user, message):
         self.Debug(f"Received message from {Slack._resolve_channel_id(channel, user)} ({channel}): {message[:25]}")
 
-        result = self.Inject(message)
+        result = self.EmitX(message)
 
         if(result != None):
             Slack.Send(channel, result)
