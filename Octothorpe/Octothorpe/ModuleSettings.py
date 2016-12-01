@@ -22,23 +22,28 @@ class _module_settings():
         self._base_key = base_key
 
     def GetInt(self, key):
-        val = self._raw(key)[0].text
+        val = self._raw(key)
 
         if(val != None):
-            val = int(val)
+            val = int(val[0].text)
 
         return val
 
     def GetBool(self, key):
-        val = self._raw(key)[0].text
+        val = self._raw(key)
 
         if(val != None):
-            val = (True if val.lower() == "true" else False)
+            val = (True if val[0].text.lower() == "true" else False)
 
         return val
 
     def GetString(self, key):
-        return self._raw(key)[0].text
+        val = self._raw(key)
+
+        if(val != None):
+            val = val[0].text
+
+        return val
 
     def GetMultiple(self, key):
         return self._raw(key)
