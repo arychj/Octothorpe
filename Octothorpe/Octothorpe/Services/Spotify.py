@@ -102,7 +102,6 @@ class Spotify(Service):
             params["csrf"] = self._get_csrf_token()
 
         url = self._build_url(url) + "?" + urllib.parse.urlencode(params)
-        print(url)
         request = urllib.request.Request(url, headers = {"Origin": self.Settings.GetString("origin_header")})
 
         return json.loads(urllib.request.urlopen(request, context=Spotify._get_request_context()).read())

@@ -35,12 +35,11 @@ class Rule:
         return True
 
     def PreparePayload(self, event):
-        sPayload = "" + self.PayloadTransform
-
-        for (k, v) in {**event.Payload, **self.Extras}.items():
-            sPayload = sPayload.replace(f"|{k}|", v)
-        
-        return json.loads(sPayload)
+        if(self.PayloadTransform != None):
+            sPayload = self.PayloadTransform.format(**{**event.Payload, **self.Extras})
+            return json.loads(sPayload)
+        else:
+            return event.Payload
 
     def Deactivate(self):
         statement = Statement.Get("Rules/Deactivate")

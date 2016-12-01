@@ -64,12 +64,15 @@ class Service(DynamicModule, metaclass=ABCMeta):
         method = getattr(service, instruction.Method, None)
         if(method != None):
             if(instruction.Payload == None):
-                instruction.Result = method()
+                result = method()
             else:
-                instruction.Result = method(**instruction.Payload)
+                result = method(**instruction.Payload)
 
-            if(instruction.Result != None):
+            if(result != None):
+                instruction.Result = result
                 service.Emit(service._event_type_default, instruction.Result)
+            else:
+                instruction.Result = {}
         else:
             Log.Error(f"Unknown method '{instruction.Method}' in '{instruction.Service}'")
 
