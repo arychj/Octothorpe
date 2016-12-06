@@ -6,7 +6,7 @@ from Octothorpe.Service import Service
 
 class Messaging(Service):
 
-    def Send(self, protocol, to, message, subject = None):
+    def Send(self, protocol, to, message, subject = None, attachments = None):
         Log.Debug(f"Sending message to {protocol}/{to}")
 
         result = None
@@ -19,7 +19,7 @@ class Messaging(Service):
         elif(protocol == "phone"):
             result = self._phone(to, message)
         elif(protocol == "slack"):
-            result = self._slack(to, message)
+            result = self._slack(to, message, attachments)
         else:
             result = {"error": f"Unkown protocol '{protocol}'"}
 
@@ -63,10 +63,10 @@ class Messaging(Service):
     def _phone(self, to, message):
         pass
 
-    def _slack(self, to, message):
-        from Octothorpe.Injectors.Slack.SlackInjector import SlackInjector
+    def _slack(self, to, message, attachments=None):
+        from Octothorpe.Services.Slack.Slack import Slack
 
-        if(SlackInjector.IsValidAddress(to)):
-            SlackInjector.Send(to, message)
+        if(Slack.IsValidAddress(to)):
+            Slack.Send(to, message, attachments)
         else:
             return {"error": f"Invalid address '{to}'"}

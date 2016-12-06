@@ -1,26 +1,55 @@
 # Must be run on machine running spotify client
 # based on https://github.com/nih0/spotify-local-http-api
 
-import ssl
+import json, re, ssl, time, urllib
 from string import ascii_lowercase
 from random import choice
-import urllib
-import json
-import time
+from functools import lru_cache
 
+from ..Injector import Injector
 from ..Service import Service
 
-class Spotify(Service):
+class Spotify(Service, Injector):
     _oauth_token = None
     _csrf_token = None
     _request_context = None
 
     _port = 4370
-    DEFAULT_RETURN_ON = ["login", "logout", "play", "pause", "error", "ap"]
+    DEFAULT_RETURN_ON = ["login", "logout", "play", "pause", "error"]#, "ap"]
+
+    @property
+    def _emitted_event_types(self):
+        return ["status", "state_change"]
+
+    def _injector_start(self):
+        self._state_signature = None
+        self._running = True
+
+        while(self._running):
+            status = self.Status()
+            self.Inject("status", status)
+
+            signature = f"{status['track']['artist_resource']['name']}:{status['track']['track_resource']['name']}:{status['playing']}"
+            if(self._state_signature != signature):
+                (cover, cover_thumbnail) = self._get_cover_urls(status["track"]["album_resource"]["uri"])
+
+                self.Inject("state_change", {
+                    "state" : ("playing" if status["playing"] else "paused"),
+                    "artist": status["track"]["artist_resource"]["name"],
+                    "track": status["track"]["track_resource"]["name"],
+                    "album": status["track"]["album_resource"]["name"],
+                    "cover": cover,
+                    "cover_thumbnail": cover_thumbnail
+                })
+
+                self._state_signature = signature
+
+    def _injector_stop(self):
+        self._running = false
 
     def Play(self, artist="", track=""):
         if(len(artist) == 0):
-            return self.Pause(False)
+            return {"now_playing": self.Pause(False)["state"]}
         else:
             if(len(track) > 0):
                 tracks = self._search("track", {"artist": artist, "track": track})
@@ -48,7 +77,6 @@ class Spotify(Service):
                 else:
                     return {"error": "unknown artist"}
 
-    #this should be an injector
     def Status(self):
         return self._call("/remote/status.json", {
             "returnafter": 59,
@@ -138,6 +166,20 @@ class Spotify(Service):
     @classmethod
     def _get_version(cls):
         return cls._call("/service/version.json", params={"service": "remote"})
+
+    @lru_cache(maxsize=32)
+    def _get_cover_urls(self, uri):
+        id = uri[uri.rfind(":")+1:]
+        
+        album = self._call(
+            url= f"api://albums/{id}", 
+            authenticated=False
+        )
+
+        if(album == None):
+            return None
+        else:
+            return (album["images"][0]["url"], album["images"][2]["url"])
 
 #    def open_spotify_client():
 #        return get(_build_url("/remote/open.json"), headers=ORIGIN_HEADER).text

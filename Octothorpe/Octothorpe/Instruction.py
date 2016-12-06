@@ -50,6 +50,8 @@ class Instruction(Task):
         self.Payload = Instruction._parse_payload(payload)
         self.Result = None
 
+        self.OutputTemplate = None
+
         if(self.Id == None):
             self.CreateRecord()
 
@@ -67,7 +69,7 @@ class Instruction(Task):
         self.Id = result.LastId
 
     def Process(self):
-        Service.Call(self)
+        Service.Process(self)
 
     def Save(self):
         if(self.Id != None):

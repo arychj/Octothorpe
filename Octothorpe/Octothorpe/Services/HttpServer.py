@@ -7,11 +7,11 @@ from ..Injector import Injector
 from ..Service import Service
 
 class HttpServer(Service, Injector):
-    def Start(self):
+    def _injector_start(self):
         self._httpd = self._threading_server(("0.0.0.0", 1664), self._server_request_handler)
         self._httpd.serve_forever()
 
-    def Stop(self):
+    def _injector_stop(self):
         self._httpd.shutdown()
 
     class _threading_server(ThreadingMixIn, http.server.HTTPServer):

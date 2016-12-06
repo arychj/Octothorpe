@@ -7,7 +7,7 @@ from .Stipulation import Stipulation, StipulationType
 
 class Rule:
     
-    def __init__(self, id, producing_service, event_type, payload_stipulations, consuming_service, consuming_method, payload_transform):
+    def __init__(self, id, producing_service, event_type, payload_stipulations, consuming_service, consuming_method, payload_transform, output_template):
         self.Id = id
         self.ProducingService = producing_service
         self.EventType = event_type
@@ -15,6 +15,7 @@ class Rule:
         self.ConsumingService = consuming_service
         self.ConsumingMethod = consuming_method
         self.PayloadTransform = payload_transform
+        self.OutputTemplate = output_template
 
         self.Extras = {}
 
@@ -91,6 +92,8 @@ class Rule:
                 consuming_service = xRule.find("consuming_service").text, 
                 consuming_method = xRule.find("consuming_method").text, 
                 payload_transform = xRule.find("payload_transform").text, 
+                output_template = xRule.find("output")
+                #shim?
             ))
 
         return rules
@@ -160,7 +163,11 @@ class PayloadFormatter(string.Formatter):
         # handle an invalid format
         if value==None: return self.missing
         try:
-            return super(PayloadFormatter, self).format_field(value, spec)
+            s = super(PayloadFormatter, self).format_field(value, spec)
+            escaped_chars = ["\\", "\""]
+            for ec in escaped_chars:
+                s = s.replace(ec, f"\\{ec}")
+            return s
         except ValueError:
             if self.bad_fmt is not None: return self.bad_fmt   
             else: raise

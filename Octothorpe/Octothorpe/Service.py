@@ -25,7 +25,7 @@ class Service(DynamicModule, metaclass=ABCMeta):
 
     @property
     def _event_type_default(self):
-        return f"_{self._instruction.Method.lower()}"
+        return self._get_default_method_event_name(self._instruction.Method)
 
     def Describe(self, method_name):
         method = getattr(self, method_name, None)
@@ -58,25 +58,34 @@ class Service(DynamicModule, metaclass=ABCMeta):
     def Error(self, message):
         Log.Error(message, tag=self.Name)
 
+    def Invoke(self, method_name, payload=None):
+        result = None
+
+        method = getattr(self, method_name, None)
+        if(method != None):
+            if(payload == None):
+                result = method()
+            else:
+                result = method(**payload)
+
+            if(result == None):
+                result = {}
+
+            self.Emit(self._get_default_method_event_name(method_name), result)
+        else:
+            Log.Error(f"Unknown method '{method_name}' in '{self.Name}'")
+
+        return result
+
+    @classmethod
+    def _get_default_method_event_name(cls, method):
+        return f"_{method.lower()}"
+
     @staticmethod
-    def Call(instruction):
+    def Process(instruction):
         service_type = Service._get_module("service", instruction.Service)
 
         service = service_type()
         service._instruction = instruction
 
-        method = getattr(service, instruction.Method, None)
-        if(method != None):
-            if(instruction.Payload == None):
-                result = method()
-            else:
-                result = method(**instruction.Payload)
-
-            if(result != None):
-                instruction.Result = result
-                service.Emit(service._event_type_default, instruction.Result)
-            else:
-                instruction.Result = {}
-        else:
-            Log.Error(f"Unknown method '{instruction.Method}' in '{instruction.Service}'")
-
+        instruction.Result = service.Invoke(instruction.Method, instruction.Payload)

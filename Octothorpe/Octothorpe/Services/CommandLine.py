@@ -1,9 +1,16 @@
 from ..Injector import Injector
+from ..Instruction import Instruction
+from ..TaskQueue import TaskQueue
 from ..Manager import Manager
 from ..Service import Service
 
 class CommandLine(Service, Injector):
-    def Start(self):
+
+    @property
+    def _emitted_event_types(self):
+        return ["instruction"]
+
+    def _injector_start(self):
         self._running = True
 
         while(self._running):
@@ -14,13 +21,16 @@ class CommandLine(Service, Injector):
                     Manager.Stop()
                     break
                 else:
-                    result = self.Inject(line)
-                    if(result != None):
-                        print(result)
+                    instruction = Instruction.Parse(line)
+                    TaskQueue.Enqueue(instruction)
+                    instruction.WaitUntilComplete()
+
+                    if(instruction.Result != None):
+                        print(instruction.Result)
                     else:
                         print("Invalid instruction")
             except Exception as e:
                 self.Error(e)
 
-    def Stop(self):
+    def _injector_stop(self):
         self._running = False

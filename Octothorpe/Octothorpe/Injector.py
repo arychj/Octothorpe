@@ -6,43 +6,61 @@ from .Config import Config
 from .DynamicModule import DynamicModule
 from .Instruction import Instruction
 from .Log import Log
-from .TaskQueue import TaskQueue
 from .Shim import Shim
+from .TaskQueue import TaskQueue
+
+#python circular dependency nonsensee
+import Octothorpe.Event
 
 class Injector(DynamicModule, metaclass=ABCMeta):
     _active_injectors = []
    
     @abstractmethod
-    def Start(self):
+    def _injector_start(self):
         pass
 
     @abstractmethod
-    def Stop(self):
+    def _injector_stop(self):
         pass
-
-    def __init__(self, shim):
-        self._shim = shim
 
     def Handle(self, handler, args=None, kwargs=None):
         t = threading.Thread(target=handler, args=args, kwargs=kwargs)
         t.start()
 
-    def EmitX(self, message):
+    def Inject(self, event_type, payload):
         result = None
 
-        shim = Shim.Get(self, self._shim)
-        event = shim.Inbound(message)
+        event = self._shim.Inshimerate(event_type, payload)
 
-        if(event):
+        if(event != None):
             TaskQueue.Enqueue(event)
 
             event.WaitUntilComplete()
 
-            if(event.CaptureInstruction != None):
-                event.CaptureInstruction.WaitUntilComplete()
-                result = shim.Outbound(event.CaptureInstruction)
+            if(event.OutputInstruction != None):
+                instruction = event.OutputInstruction
+
+                instruction.WaitUntilComplete()
+
+                result = self._shim.Outshimerate(instruction)
+#                if(instruction.OutputTemplate != None):
+#                    result = instruction.OutputTemplate.format(**instruction.Result)
+#                else:
+#                    result = instruction.Result
 
         return result
+
+    def _create_event(self, event_type, payload):
+        if(event_type in self._emitted_event_types):
+            return Octothorpe.Event.Event.Create( #python circular dependency nonsense
+                None,
+                self.Name,
+                event_type,
+                payload
+            )
+        else:
+            Log.Error(f"Unknown event type '{event_type}' emitted by shim {self.Name}")
+            return None
 
     @staticmethod
     def StartAll():
@@ -51,11 +69,10 @@ class Injector(DynamicModule, metaclass=ABCMeta):
         for xInjector in xInjectors:
             injector_type = Injector._get_module("service", xInjector.attrib["name"])
             
-            injector = injector_type(
-                (xInjector.attrib['shim'] if "shim" in xInjector.attrib else None)
-            )
+            injector = injector_type()
+            injector._shim = Shim.Get(injector, xInjector.attrib['shim'] if "shim" in xInjector.attrib else None)
 
-            t = threading.Thread(target=injector.Start)
+            t = threading.Thread(target=injector._injector_start)
             t.daemon = True
             t.start()
 
@@ -68,4 +85,4 @@ class Injector(DynamicModule, metaclass=ABCMeta):
         Log.System("Stopping injectors")
 
         for injector in Injector._active_injectors:
-            injector.Stop()
+            injector._injector_stop()

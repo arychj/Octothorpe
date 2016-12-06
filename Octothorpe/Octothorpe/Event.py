@@ -38,16 +38,14 @@ class Event(Task):
         self.Payload = payload
         self.EmittedOn = emitted_on
 
-        self.CaptureService = None
-        self.CaptureMethod = None
-        self.CaptureInstruction = None
+        self.OutputInstruction = None
 
         if(self.Id == None):
             self.CreateRecord()
 
     def Capture(self, service, method):
         self.CaptureService = service
-        self.CaptureMethod = metho
+        self.CaptureMethod = method
 
     def Process(self):
         rules = Rule.GetMatches(self)
@@ -59,8 +57,9 @@ class Event(Task):
                 rule.PreparePayload(self)
             )
 
-            if(self.CaptureService == instruction.Service and self.CaptureMethod == instruction.Method):
-                self.CaptureInstruction = instructio
+            if(rule.OutputTemplate != None and rule.OutputTemplate.attrib['service'] == instruction.Service and rule.OutputTemplate.attrib['method'] == instruction.Method):
+                instruction.OutputTemplate = rule.OutputTemplate.find("template").text
+                self.OutputInstruction = instruction
                 
             TaskQueue.Enqueue(instruction)
 

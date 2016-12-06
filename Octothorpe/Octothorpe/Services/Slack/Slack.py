@@ -29,7 +29,7 @@ class Slack(Service, Injector):
 
         return None, None, None
 
-    def Start(self):
+    def _injector_start(self):
         read_interval = self.Settings.GetInt("read_interval")
         self._running = True
 
@@ -45,24 +45,25 @@ class Slack(Service, Injector):
         else:
             self.Log("Connection failed")
 
-    def Stop(self):
+    def _injector_stop(self):
         self._running = False
 
     def _message_handler(self, channel, user, message):
         self.Debug(f"Received message from {Slack._resolve_channel_id(channel, user)} ({channel}): {message[:25]}")
 
-        result = self.EmitX(message)
+        result = self.Inject("message_received", {"channel": channel, "user": user, "message": message})
 
         if(result != None):
-            Slack.Send(channel, result)
+            Slack.Send(channel, result["response"])
 
     @classmethod
     def IsValidAddress(cls, address):
         return (address and (address[0] == "#" or address == "@"))
             
     @classmethod
-    def Send(cls, channel_name, message):
-        cls.Client.api_call("chat.postMessage", channel=channel_name, text=message, as_user=True)
+    def Send(cls, channel_name, message, attachments=None):
+        print(attachments)
+        cls.Client.api_call("chat.postMessage", channel=channel_name, text=message, as_user=True, attachments=attachments)
     
     @classmethod
     @lru_cache(maxsize=8)
